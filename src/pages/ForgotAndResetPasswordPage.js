@@ -145,7 +145,30 @@ const ForgotAndResetPasswordPage = () => {
                 {errors.email && <div className="text-error"><AlertCircle size={14} /> {errors.email.message}</div>}
               </div>
 
-              <button type="submit" className="reset-password-button" disabled={isSubmitting}>
+              <button type="submit" className="reset-password-button" disabled={isSubmitting}
+                style={{
+                  background: isSubmitting ? '#00c6ff' : '#00c6ff',
+                  color: '#fff',
+                  opacity: isSubmitting ? 0.7 : 1,
+                  cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                  boxShadow: '0 0 20px rgba(0,198,255,0.15)',
+                  transition: 'background 0.25s cubic-bezier(.4,0,.2,1), box-shadow 0.25s cubic-bezier(.4,0,.2,1), opacity 0.2s',
+                  position: 'relative',
+                  overflow: 'hidden',
+                }}
+                onMouseEnter={e => {
+                  if (!isSubmitting) {
+                    e.currentTarget.style.background = '#33d6ff';
+                    e.currentTarget.style.boxShadow = '0 4px 24px rgba(0,198,255,0.22)';
+                  }
+                }}
+                onMouseLeave={e => {
+                  if (!isSubmitting) {
+                    e.currentTarget.style.background = '#00c6ff';
+                    e.currentTarget.style.boxShadow = '0 0 20px rgba(0,198,255,0.15)';
+                  }
+                }}
+              >
                 {isSubmitting ? (
                   <>
                     <span className="spinner" aria-hidden="true"></span>
@@ -176,7 +199,30 @@ const ForgotAndResetPasswordPage = () => {
                 {errors.otp && <div className="text-error"><AlertCircle size={14} /> {errors.otp.message}</div>}
               </div>
 
-              <button type="submit" className="reset-password-button" disabled={isSubmitting}>
+              <button type="submit" className="reset-password-button" disabled={isSubmitting}
+                style={{
+                  background: isSubmitting ? '#00c6ff' : '#00c6ff',
+                  color: '#fff',
+                  opacity: isSubmitting ? 0.7 : 1,
+                  cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                  boxShadow: '0 0 20px rgba(0,198,255,0.15)',
+                  transition: 'background 0.25s cubic-bezier(.4,0,.2,1), box-shadow 0.25s cubic-bezier(.4,0,.2,1), opacity 0.2s',
+                  position: 'relative',
+                  overflow: 'hidden',
+                }}
+                onMouseEnter={e => {
+                  if (!isSubmitting) {
+                    e.currentTarget.style.background = '#33d6ff';
+                    e.currentTarget.style.boxShadow = '0 4px 24px rgba(0,198,255,0.22)';
+                  }
+                }}
+                onMouseLeave={e => {
+                  if (!isSubmitting) {
+                    e.currentTarget.style.background = '#00c6ff';
+                    e.currentTarget.style.boxShadow = '0 0 20px rgba(0,198,255,0.15)';
+                  }
+                }}
+              >
                 {isSubmitting ? (
                   <>
                     <span className="spinner" aria-hidden="true"></span>
@@ -236,7 +282,30 @@ const ForgotAndResetPasswordPage = () => {
               </div>
 
 
-              <button type="submit" className="reset-password-button" disabled={isSubmitting}>
+              <button type="submit" className="reset-password-button" disabled={isSubmitting}
+                style={{
+                  background: isSubmitting ? '#00c6ff' : '#00c6ff',
+                  color: '#fff',
+                  opacity: isSubmitting ? 0.7 : 1,
+                  cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                  boxShadow: '0 0 20px rgba(0,198,255,0.15)',
+                  transition: 'background 0.25s cubic-bezier(.4,0,.2,1), box-shadow 0.25s cubic-bezier(.4,0,.2,1), opacity 0.2s',
+                  position: 'relative',
+                  overflow: 'hidden',
+                }}
+                onMouseEnter={e => {
+                  if (!isSubmitting) {
+                    e.currentTarget.style.background = '#33d6ff';
+                    e.currentTarget.style.boxShadow = '0 4px 24px rgba(0,198,255,0.22)';
+                  }
+                }}
+                onMouseLeave={e => {
+                  if (!isSubmitting) {
+                    e.currentTarget.style.background = '#00c6ff';
+                    e.currentTarget.style.boxShadow = '0 0 20px rgba(0,198,255,0.15)';
+                  }
+                }}
+              >
                 {isSubmitting ? (
                   <>
                     <span className="spinner" aria-hidden="true"></span>
@@ -250,10 +319,47 @@ const ForgotAndResetPasswordPage = () => {
 
           <div className="auth-footer">
             <p>Remember your password?{' '}
-              <button onClick={() => navigate('/login')} className="auth-link" disabled={isSubmitting}>
+              <button
+                onClick={() => navigate('/login')}
+                className="auth-link forgot-animated-underline"
+                disabled={isSubmitting}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#00c6ff',
+                  cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                  padding: 0,
+                  position: 'relative',
+                  textDecoration: 'none',
+                  transition: 'color 0.2s',
+                }}
+              >
                 Sign in
               </button>
             </p>
+            <style>{`
+              .forgot-animated-underline {
+                position: relative;
+                overflow: visible;
+              }
+              .forgot-animated-underline::after {
+                content: '';
+                position: absolute;
+                left: 0;
+                bottom: -2px;
+                width: 0%;
+                height: 2px;
+                background: #00c6ff;
+                transition: width 0.3s cubic-bezier(.4,0,.2,1);
+                border-radius: 2px;
+              }
+              .forgot-animated-underline:hover::after {
+                width: 100%;
+              }
+              .forgot-animated-underline:focus::after {
+                width: 100%;
+              }
+            `}</style>
           </div>
         </div>
         {showModal && (

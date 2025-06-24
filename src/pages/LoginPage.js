@@ -171,8 +171,18 @@ const LoginPage = ({ onLoginSuccess }) => {
             <button
               type="button"
               onClick={() => navigate('/forgot-password')}
-              className="forgot-password"
+              className="forgot-password forgot-link-animated-underline"
               disabled={isSubmitting}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: '#00c6ff',
+                cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                padding: 0,
+                position: 'relative',
+                textDecoration: 'none',
+                transition: 'color 0.2s',
+              }}
             >
               Forgot password?
             </button>
@@ -192,12 +202,26 @@ const LoginPage = ({ onLoginSuccess }) => {
               className="custom-button"
               disabled={isSubmitting}
               style={{
-                background: isSubmitting ? '#00c6ff' : undefined,
+                background: isSubmitting ? '#00c6ff' : '#00c6ff',
                 color: '#fff',
                 opacity: isSubmitting ? 0.7 : 1,
                 cursor: isSubmitting ? 'not-allowed' : 'pointer',
-                boxShadow: '0 0 20px rgba(0,198,255,0.2)',
-                transition: 'all 0.2s',
+                boxShadow: '0 0 20px rgba(0,198,255,0.15)',
+                transition: 'background 0.25s cubic-bezier(.4,0,.2,1), box-shadow 0.25s cubic-bezier(.4,0,.2,1), opacity 0.2s',
+                position: 'relative',
+                overflow: 'hidden',
+              }}
+              onMouseEnter={e => {
+                if (!isSubmitting) {
+                  e.currentTarget.style.background = '#33d6ff';
+                  e.currentTarget.style.boxShadow = '0 4px 24px rgba(0,198,255,0.22)';
+                }
+              }}
+              onMouseLeave={e => {
+                if (!isSubmitting) {
+                  e.currentTarget.style.background = '#00c6ff';
+                  e.currentTarget.style.boxShadow = '0 0 20px rgba(0,198,255,0.15)';
+                }
               }}
             >
               {isSubmitting ? (
@@ -214,10 +238,68 @@ const LoginPage = ({ onLoginSuccess }) => {
           <div className="auth-footer">
             <p>
               Don't have an account?{' '}
-              <button onClick={() => navigate('/signup')} className="auth-link" disabled={isSubmitting}>
+              <button
+                onClick={() => navigate('/signup')}
+                className="auth-link login-animated-underline"
+                disabled={isSubmitting}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#00c6ff',
+                  cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                  padding: 0,
+                  position: 'relative',
+                  textDecoration: 'none',
+                  transition: 'color 0.2s',
+                }}
+              >
                 Create account
               </button>
             </p>
+            <style>{`
+              .login-animated-underline {
+                position: relative;
+                overflow: visible;
+              }
+              .login-animated-underline::after {
+                content: '';
+                position: absolute;
+                left: 0;
+                bottom: -2px;
+                width: 0%;
+                height: 2px;
+                background: #00c6ff;
+                transition: width 0.3s cubic-bezier(.4,0,.2,1);
+                border-radius: 2px;
+              }
+              .login-animated-underline:hover::after {
+                width: 100%;
+              }
+              .login-animated-underline:focus::after {
+                width: 100%;
+              }
+              .forgot-link-animated-underline {
+                position: relative;
+                overflow: visible;
+              }
+              .forgot-link-animated-underline::after {
+                content: '';
+                position: absolute;
+                left: 0;
+                bottom: -2px;
+                width: 0%;
+                height: 2px;
+                background: #00c6ff;
+                transition: width 0.3s cubic-bezier(.4,0,.2,1);
+                border-radius: 2px;
+              }
+              .forgot-link-animated-underline:hover::after {
+                width: 100%;
+              }
+              .forgot-link-animated-underline:focus::after {
+                width: 100%;
+              }
+            `}</style>
           </div>
         </div>
       </div>

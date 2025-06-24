@@ -588,12 +588,26 @@ const SignupPage = () => {
               className="custom-button"
               disabled={loading}
               style={{
-                background: loading ? '#00c6ff' : undefined,
+                background: loading ? '#00c6ff' : '#00c6ff',
                 color: '#fff',
                 opacity: loading ? 0.7 : 1,
                 cursor: loading ? 'not-allowed' : 'pointer',
-                boxShadow: '0 0 20px rgba(0,198,255,0.2)',
-                transition: 'all 0.2s',
+                boxShadow: '0 0 20px rgba(0,198,255,0.15)',
+                transition: 'background 0.25s cubic-bezier(.4,0,.2,1), box-shadow 0.25s cubic-bezier(.4,0,.2,1), opacity 0.2s',
+                position: 'relative',
+                overflow: 'hidden',
+              }}
+              onMouseEnter={e => {
+                if (!loading) {
+                  e.currentTarget.style.background = '#33d6ff';
+                  e.currentTarget.style.boxShadow = '0 4px 24px rgba(0,198,255,0.22)';
+                }
+              }}
+              onMouseLeave={e => {
+                if (!loading) {
+                  e.currentTarget.style.background = '#00c6ff';
+                  e.currentTarget.style.boxShadow = '0 0 20px rgba(0,198,255,0.15)';
+                }
               }}
             >
               {loading ? (
@@ -615,10 +629,47 @@ const SignupPage = () => {
           <div className="auth-footer">
             <p>
               Already have an account?{' '}
-              <button onClick={() => navigate('/login')} className="auth-link" disabled={loading}>
+              <button
+                onClick={() => navigate('/login')}
+                className="auth-link signup-animated-underline"
+                disabled={loading}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#00c6ff',
+                  cursor: loading ? 'not-allowed' : 'pointer',
+                  padding: 0,
+                  position: 'relative',
+                  textDecoration: 'none',
+                  transition: 'color 0.2s',
+                }}
+              >
                 Sign in
               </button>
             </p>
+            <style>{`
+              .signup-animated-underline {
+                position: relative;
+                overflow: visible;
+              }
+              .signup-animated-underline::after {
+                content: '';
+                position: absolute;
+                left: 0;
+                bottom: -2px;
+                width: 0%;
+                height: 2px;
+                background: #00c6ff;
+                transition: width 0.3s cubic-bezier(.4,0,.2,1);
+                border-radius: 2px;
+              }
+              .signup-animated-underline:hover::after {
+                width: 100%;
+              }
+              .signup-animated-underline:focus::after {
+                width: 100%;
+              }
+            `}</style>
           </div>
         </div>
         {showModal && (
