@@ -160,6 +160,9 @@ const SignupPage = () => {
     <>
       <div className="auth-bg-animated"></div>
       <div className="auth-bg-blur"></div>
+      <div className="auth-bg-particles">
+        <span></span><span></span><span></span><span></span><span></span>
+      </div>
       <div className="signup-container">
         <div className="signup-card">
           <div className="signup-header">
