@@ -595,7 +595,6 @@ function IntelligentTestAnalysis() {
                   filteredHistory.map((item, idx) => (
                     <div
                       key={idx}
-                      onClick={() => fetchAnalysisFile(item.filename)}
                       style={{
                         padding: "16px",
                         marginBottom: "8px",

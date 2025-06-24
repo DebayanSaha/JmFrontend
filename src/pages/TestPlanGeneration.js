@@ -834,7 +834,6 @@ const TestPlanGeneration = () => {
                   <div
                     className="tp-history-card"
                     key={index}
-                    onClick={() => handleDownload(item.filename)}
                     style={{ cursor: "pointer", display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}
                   >
                     <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
