@@ -6,10 +6,11 @@ import { Outlet } from "react-router-dom";
 import { useResponsive } from './useResponsive';
 
 function Layout({ licenseStatus }) {
-  const { isSm } = useResponsive();
+  const { isSm, isXs } = useResponsive();
+  const isMobile = isXs || isSm;
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const sidebarWidth = isSm ? "100%" : "260px";
+  const sidebarWidth = isMobile ? "100%" : "260px";
 
   return (
     <div style={{ 
@@ -23,7 +24,7 @@ function Layout({ licenseStatus }) {
     }}>
       <Header 
         licenseStatus={licenseStatus} 
-        isMobile={isSm}
+        isMobile={isMobile}
         sidebarOpen={sidebarOpen}
         setSidebarOpen={setSidebarOpen}
       />
@@ -37,13 +38,12 @@ function Layout({ licenseStatus }) {
         overflowX: 'hidden'
       }}>
         <Sidebar 
-          isMobile={isSm}
+          isMobile={isMobile}
           sidebarOpen={sidebarOpen}
           setSidebarOpen={setSidebarOpen}
         />
-        
         {/* Mobile overlay */}
-        {isSm && sidebarOpen && (
+        {isMobile && sidebarOpen && (
           <div
             style={{
               position: 'fixed',
@@ -58,15 +58,14 @@ function Layout({ licenseStatus }) {
             onClick={() => setSidebarOpen(false)}
           />
         )}
-        
         <div 
           style={{ 
-            marginLeft: isSm ? '0' : sidebarWidth, 
+            marginLeft: isMobile ? '0' : sidebarWidth, 
             paddingTop: '40px',
             flexGrow: 1,
             display: 'flex',
             flexDirection: 'column',
-            width: isSm ? '100%' : `calc(100% - ${sidebarWidth})`,
+            width: isMobile ? '100%' : `calc(100% - ${sidebarWidth})`,
             maxWidth: '100%',
             boxSizing: 'border-box',
             transition: 'margin-left 0.3s ease, width 0.3s ease',

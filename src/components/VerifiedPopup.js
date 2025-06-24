@@ -15,10 +15,12 @@ const VerifiedPopup = () => {
       case 'success':
         setMessage('Your email has been successfully verified!');
         setIcon(<CheckCircle2 size={36} className="icon success" />);
+        setShowLoginButton(true);
         break;
       case 'already_verified':
         setMessage('Email already verified. You can log in.');
         setIcon(<Info size={36} className="icon info" />);
+        setShowLoginButton(true);
         break;
       case 'not_found':
         setMessage('User not found.');
@@ -38,6 +40,35 @@ const VerifiedPopup = () => {
         {icon}
         <h2 className="popup-heading">Email Verification</h2>
         <p className="popup-message">{message}</p>
+
+        {showLoginButton && (
+          <button
+            onClick={() => navigate('/login')}
+            style={{
+              marginTop: '20px',
+              padding: '10px 20px',
+              backgroundColor: '#FF6D00',
+              color: 'white',
+              fontSize: '16px',
+              fontWeight: '600',
+              borderRadius: '12px',
+              border: 'none',
+              cursor: 'pointer',
+              boxShadow: '0 4px 10px rgba(255, 109, 0, 0.3)',
+              transition: 'all 0.3s ease',
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.backgroundColor = '#e65c00';
+              e.target.style.transform = 'translateY(-2px)';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.backgroundColor = '#FF6D00';
+              e.target.style.transform = 'translateY(0)';
+            }}
+          >
+            Go to Login
+          </button>
+        )}
       </div>
     </div>
   );
@@ -129,7 +160,7 @@ export const createProtectedActionHandler = (showLoginModal) => {
         message: `Please log in to ${actionName}`
       };
     }
-    
+
     try {
       const result = action();
       return {
@@ -159,7 +190,7 @@ export const createProtectedAsyncActionHandler = (showLoginModal) => {
         message: `Please log in to ${actionName}`
       };
     }
-    
+
     try {
       const result = await asyncAction();
       return {
@@ -191,7 +222,7 @@ export const withAuthProtection = (WrappedComponent, actionName = 'perform this 
         setShowModal(true);
         return;
       }
-      
+
       if (onClick) {
         onClick(event);
       }
@@ -207,7 +238,7 @@ export const withAuthProtection = (WrappedComponent, actionName = 'perform this 
         >
           {children}
         </WrappedComponent>
-        
+
         <LoginRequiredModal
           isOpen={showModal}
           onClose={() => setShowModal(false)}
@@ -309,7 +340,7 @@ const LoginRequiredModal = ({ isOpen, onClose }) => {
             borderRadius: '50%',
           }}
         />
-        
+
         <div
           style={{
             fontSize: '48px',
@@ -319,7 +350,7 @@ const LoginRequiredModal = ({ isOpen, onClose }) => {
         >
           🔐
         </div>
-        
+
         <h2
           style={{
             fontSize: '24px',
@@ -331,7 +362,7 @@ const LoginRequiredModal = ({ isOpen, onClose }) => {
         >
           Login Required
         </h2>
-        
+
         <p
           style={{
             fontSize: '16px',
@@ -343,7 +374,7 @@ const LoginRequiredModal = ({ isOpen, onClose }) => {
         >
           Please log in to access this feature and unlock the full potential of our platform.
         </p>
-        
+
         <div
           style={{
             display: 'flex',
@@ -383,7 +414,7 @@ const LoginRequiredModal = ({ isOpen, onClose }) => {
           >
             Log In
           </button>
-          
+
           <button
             onClick={() => {
               onClose();
@@ -413,7 +444,7 @@ const LoginRequiredModal = ({ isOpen, onClose }) => {
             Sign Up
           </button>
         </div>
-        
+
         <button
           onClick={onClose}
           style={{
@@ -464,7 +495,7 @@ export const useProtectedAction = () => {
         message: `Please log in to ${actionName}`
       };
     }
-    
+
     try {
       const result = action();
       return {
@@ -491,7 +522,7 @@ export const useProtectedAction = () => {
         message: `Please log in to ${actionName}`
       };
     }
-    
+
     try {
       const result = await asyncAction();
       return {

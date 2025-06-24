@@ -24,52 +24,72 @@ const AppRouter = () => {
   // Capture where the user originally intended to go
   const [initialPath] = useState(window.location.pathname);
 
+  // ✅ 1. This one REPLACED with the new full logic
   useEffect(() => {
-    console.log('AppRouter: Initializing...');
-    console.log('Current pathname:', window.location.pathname);
-    
-    setNavigate(navigate);
+    const initAuth = async () => {
+      setNavigate(navigate);
 
-    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-    const userData = localStorage.getItem('user') || sessionStorage.getItem('user');
+      const token = localStorage.getItem('token');
+      const userData = localStorage.getItem('user');
+      const rememberMe = localStorage.getItem('rememberMe') === 'true';
 
-    console.log('Token exists:', !!token);
-    console.log('User data exists:', !!userData);
+      const evaluateLicense = (data) => {
+        const now = new Date();
+        const trialEnd = data.trial_ends_at ? new Date(data.trial_ends_at) : null;
+        const paidEnd = data.paid_ends_at ? new Date(data.paid_ends_at) : null;
 
-    const evaluateLicense = (data) => {
-      const now = new Date();
-      const trialEnd = data.trial_ends_at ? new Date(data.trial_ends_at) : null;
-      const paidEnd = data.paid_ends_at ? new Date(data.paid_ends_at) : null;
+        if (paidEnd && paidEnd > now) return 'paid';
+        if (trialEnd && trialEnd > now) return 'trial';
+        return 'expired';
+      };
 
-      if (paidEnd && paidEnd > now) return 'paid';
-      if (trialEnd && trialEnd > now) return 'trial';
-      return 'expired';
+      if (token && userData) {
+        const parsedUser = JSON.parse(userData);
+        setUser(parsedUser);
+        setLicenseStatus(evaluateLicense(parsedUser));
+        localStorage.setItem('isAuthenticated', 'true');
+      } else if (rememberMe) {
+        try {
+          const res = await axiosInstance.post('/refresh', {}, { withCredentials: true });
+          const newToken = res.data.access_token;
+
+          if (newToken) {
+            localStorage.setItem('token', newToken);
+            axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
+
+            if (userData) {
+              const parsedUser = JSON.parse(userData);
+              setUser(parsedUser);
+              setLicenseStatus(evaluateLicense(parsedUser));
+              localStorage.setItem('isAuthenticated', 'true');
+            }
+          }
+        } catch (err) {
+          console.warn('Token refresh failed. Redirecting to login.');
+          localStorage.clear();
+          setUser(null);
+          setLicenseStatus(null);
+        }
+      } else {
+        localStorage.removeItem('isAuthenticated');
+        setUser(null);
+        setLicenseStatus(null);
+      }
+
+      setLoading(false);
     };
 
-    if (token && userData) {
-      const parsedUser = JSON.parse(userData);
-      setUser(parsedUser);
-      setLicenseStatus(evaluateLicense(parsedUser));
-      // Set authentication flag for login enforcement
-      localStorage.setItem('isAuthenticated', 'true');
-      console.log('User authenticated, license status:', evaluateLicense(parsedUser));
-    } else {
-      localStorage.removeItem('isAuthenticated');
-      setUser(null);
-      setLicenseStatus(null);
-      console.log('No user data found, setting up demo mode');
-    }
-
-    setLoading(false);
+    initAuth();
   }, [navigate]);
 
-  // Force redirect to login if on root path
+  // ✅ 2. This one REMAINS AS IS
   useEffect(() => {
     if (!loading && window.location.pathname === '/') {
       console.log('Redirecting from root to login...');
       navigate('/login', { replace: true });
     }
   }, [loading, navigate]);
+
 
   const handleLoginSuccess = (userData, token) => {
     setUser(userData);
@@ -82,8 +102,8 @@ const AppRouter = () => {
     const license = paidEnd && paidEnd > now
       ? 'paid'
       : trialEnd && trialEnd > now
-      ? 'trial'
-      : 'expired';
+        ? 'trial'
+        : 'expired';
 
     setLicenseStatus(license);
 
@@ -127,8 +147,8 @@ const AppRouter = () => {
             !isAuthenticated
               ? <Navigate to="/login" replace />
               : (licenseStatus === 'expired'
-                  ? <Navigate to="/payment" replace />
-                  : <Dashboard />)
+                ? <Navigate to="/payment" replace />
+                : <Dashboard />)
           }
         />
         <Route
@@ -137,8 +157,8 @@ const AppRouter = () => {
             !isAuthenticated
               ? <Navigate to="/login" replace />
               : (licenseStatus === 'expired'
-                  ? <Navigate to="/payment" replace />
-                  : <IntelligentTestAnalysis />)
+                ? <Navigate to="/payment" replace />
+                : <IntelligentTestAnalysis />)
           }
         />
         <Route
@@ -147,8 +167,8 @@ const AppRouter = () => {
             !isAuthenticated
               ? <Navigate to="/login" replace />
               : (licenseStatus === 'expired'
-                  ? <Navigate to="/payment" replace />
-                  : <TestPlanGeneration />)
+                ? <Navigate to="/payment" replace />
+                : <TestPlanGeneration />)
           }
         />
         <Route
@@ -157,8 +177,8 @@ const AppRouter = () => {
             !isAuthenticated
               ? <Navigate to="/login" replace />
               : (licenseStatus === 'expired'
-                  ? <Navigate to="/payment" replace />
-                  : <RunTestPage />)
+                ? <Navigate to="/payment" replace />
+                : <RunTestPage />)
           }
         />
         <Route

@@ -320,20 +320,24 @@ function IntelligentTestAnalysis() {
       <div className="tp-main" style={{
         width: "100%",
         maxWidth: "1200px",
-        margin: "0 ",
-        padding: "50px 20px 32px 16px",
+        margin: "0 auto",
+        padding: "clamp(12px, 4vw, 32px) clamp(6px, 3vw, 24px) clamp(24px, 4vw, 40px) clamp(6px, 3vw, 24px)",
         position: "relative",
-        marginTop: "-25px",
-        marginLeft: "-30px",
-        transition: "margin-left 0.3s ease",
+        zIndex: 1,
+        boxSizing: "border-box",
+        maxWidth: "100vw",
+        overflowX: "hidden",
+        minHeight: "100vh",
+        display: 'flex',
+        flexDirection: 'column',
       }}>
         {/* Decorative SVG blob behind header */}
         <svg className="tp-header-blob" viewBox="0 0 320 160" fill="none" xmlns="http://www.w3.org/2000/svg" style={{
           position: "absolute",
-          top: "-10px",
-          left: "-20px",
-          width: "320px",
-          height: "160px",
+          top: "-18px",
+          left: "-18px",
+          width: "clamp(180px, 60vw, 320px)",
+          height: "clamp(90px, 30vw, 160px)",
           zIndex: 0,
           pointerEvents: "none"
         }}>
@@ -344,26 +348,32 @@ function IntelligentTestAnalysis() {
           background: "none",
           borderRadius: "16px",
           color: "#FF6D00",
-          padding: "40px 32px 32px 32px",
-          marginBottom: "-10px",
+          padding: "clamp(18px, 5vw, 40px) clamp(8px, 4vw, 32px) clamp(12px, 3vw, 32px) clamp(8px, 4vw, 32px)",
+          marginBottom: "clamp(0px, 1vw, 8px)",
           position: "relative",
-          zIndex: 1
+          zIndex: 1,
+          width: '100%',
+          boxSizing: 'border-box',
         }}>
           <div className="tp-header-title" style={{
-            fontSize: "34px",
+            fontSize: "clamp(1.5rem, 7vw, 2.2rem)",
             fontWeight: "900",
             color: "#FF6D00",
             marginBottom: "4px",
-            letterSpacing: "0.5px"
+            letterSpacing: "0.5px",
+            whiteSpace: 'normal',
+            overflowWrap: 'break-word',
           }}>
             Intelligent Test Analysis
           </div>
           <div className="tp-header-desc" style={{
-            fontSize: "16px",
+            fontSize: "clamp(1rem, 3vw, 1.2rem)",
             fontWeight: "550",
             fontStyle: "bold",
             opacity: "0.85",
             color: "#333333",
+            whiteSpace: 'normal',
+            overflowWrap: 'break-word',
           }}>
             Unlocking Insights from JMeterAI Test Runs
           </div>

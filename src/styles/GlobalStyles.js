@@ -10,10 +10,12 @@ export const GlobalStyles = createGlobalStyle`
     body {
         font-family: Arial, sans-serif;
         margin: 0;
+    
+
+    .tp-chat-container {
         padding: 20px;
         padding-bottom: 0px;
         padding-right: 0px;
-        background:linear-gradient(to bottom, #FFF8F1, #FFF1E6);
     }
 
     .container {

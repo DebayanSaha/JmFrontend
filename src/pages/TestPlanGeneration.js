@@ -269,15 +269,15 @@ const TestPlanGeneration = () => {
         .tp-main {
           width: 100%;
           max-width: 1200px;
-          margin: 0;
+          margin: 0 auto;
           padding: 70px 16px 32px 16px;
           position: relative;
+          z-index: 1;
         }
-        /* Decorative header blob */
         .tp-header-blob {
           position: absolute;
-          top: -40px;
-          left: -60px;
+          top: -14px;
+          left: -32px;
           width: 320px;
           height: 160px;
           z-index: 0;
@@ -287,34 +287,43 @@ const TestPlanGeneration = () => {
           background: none;
           border-radius: var(--tp-radius);
           color: var(--tp-orange-dark);
-          padding: 40px 32px 32px 32px;
-          margin-bottom: 32px;
-          margin-top: -50px;
-          margin-left: -30px;
+          padding: 8px 16px 24px 16px;
+          margin-bottom: 8px;
+          margin-top: 0;
+          margin-left: 0;
           position: relative;
           z-index: 1;
           font-family: var(--tp-font);
+          width: 100%;
+          box-sizing: border-box;
         }
         .tp-header-title {
-          font-size: 34px;
+          font-size: clamp(1.5rem, 4vw, 2.5rem);
           font-weight: 900;
           color: var(--tp-orange-dark);
           margin-bottom: 8px;
           letter-spacing: 0.5px;
+          white-space: normal;
+          overflow-wrap: break-word;
         }
         .tp-header-desc {
-          font-size: 16px;
+          font-size: clamp(1rem, 2vw, 1.25rem);
           font-weight: 550;
           font-style: bold;
           opacity: 0.85;
           color: var(--tp-text);
+          white-space: normal;
+          overflow-wrap: break-word;
         }
         .tp-panels {
           display: flex;
           gap: 24px;
           justify-content: center;
           align-items: flex-start;
-          margin-top: -24px;
+          margin-top: 0;
+          flex-direction: row;
+          position: relative;
+          z-index: 1;
         }
         .tp-panel {
           background: var(--tp-white);
@@ -578,48 +587,34 @@ const TestPlanGeneration = () => {
           to { opacity: 1; }
         }
         /* Responsive */
-        @media (max-width: 1023px) {
+        @media (max-width: 1024px) {
           .tp-panels {
             flex-direction: column;
-            gap: 24px;
-          }
-          .tp-panel-history, .tp-panel-chat {
-            max-width: 100%;
-            min-width: 0;
+            gap: 16px;
           }
         }
         @media (max-width: 767px) {
           .tp-main {
-            padding: 12px 2px 12px 2px;
+            padding: 16px 4px 8px 4px;
           }
           .tp-header {
-            padding: 18px 8px 12px 8px;
+            padding: 12px 4px 8px 4px;
             font-size: 18px;
           }
           .tp-panel {
-            padding: 12px;
-          }
-          .tp-panel-title {
-            font-size: 17px;
-          }
-          .tp-chat-bubble-content, .tp-search-input, .tp-filter-select, .tp-chat-input {
-            font-size: 14px;
-            padding: 10px 12px;
+            padding: 10px;
           }
         }
         @media (max-width: 480px) {
           .tp-main {
-            padding: 4px 0 4px 0;
+            padding: 8px 2px 4px 2px;
           }
           .tp-header {
-            padding: 10px 2px 8px 2px;
+            padding: 8px 2px 6px 2px;
             font-size: 15px;
           }
           .tp-panel {
             padding: 6px;
-          }
-          .tp-panel-title {
-            font-size: 15px;
           }
         }
         /* Enhanced Responsive Breakpoints */
@@ -727,7 +722,7 @@ const TestPlanGeneration = () => {
         }
       `}</style>
 
-      <div className="tp-main">
+      <div className="tp-main" style={{ position: 'relative', zIndex: 1 }}>
         {/* Decorative SVG blob behind header */}
         <svg className="tp-header-blob" viewBox="0 0 320 160" fill="none" xmlns="http://www.w3.org/2000/svg">
           <ellipse cx="160" cy="80" rx="160" ry="80" fill="#FFE0B2" fillOpacity="0.7" />

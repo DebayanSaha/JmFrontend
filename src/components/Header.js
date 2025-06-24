@@ -4,7 +4,7 @@ import { FaUser, FaPowerOff, FaClock, FaCog, FaSignOutAlt } from "react-icons/fa
 import axiosInstance from "../api/axiosInstance";
 import { useAuthContext } from '../context/AuthContext';
 
-const Header = ({ licenseStatus }) => {
+const Header = ({ licenseStatus, isMobile, sidebarOpen, setSidebarOpen }) => {
   const navigate = useNavigate();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [license, setLicense] = useState("Loading...");
@@ -78,10 +78,11 @@ const handleLogout = () => {
       className="page-navbar"
       style={{
         display: "flex",
+        flexWrap: 'wrap',
         justifyContent: "space-between",
         alignItems: "center",
-        height: "80px",
-        padding: "0 20px",
+        height: "clamp(44px, 7vw, 80px)",
+        padding: "clamp(2px, 2vw, 12px) clamp(6px, 4vw, 32px)",
         background: "linear-gradient(135deg, rgba(26, 26, 46, 0.95), rgba(22, 33, 62, 0.95))",
         backdropFilter: "blur(20px)",
         borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
@@ -91,30 +92,69 @@ const handleLogout = () => {
         left: 0,
         right: 0,
         zIndex: 9999,
+        width: '100vw',
+        boxSizing: 'border-box',
+        gap: 'clamp(2px, 2vw, 24px)',
+        minWidth: 0,
+        maxWidth: '100vw',
+        overflowX: 'hidden',
       }}
     >
+      {isMobile && (
+        <button
+          aria-label="Open sidebar"
+          style={{
+            background: "none",
+            border: "none",
+            color: "#fff",
+            fontSize: "clamp(1.2rem, 5vw, 2rem)",
+            marginRight: "clamp(4px, 2vw, 16px)",
+            cursor: "pointer",
+            display: 'flex',
+            alignItems: 'center',
+          }}
+          onClick={() => setSidebarOpen(true)}
+        >
+          <span style={{ fontSize: 'clamp(1.2rem, 5vw, 2rem)', lineHeight: 1 }}>&#9776;</span>
+        </button>
+      )}
       <div
         style={{
-          fontSize: "24px",
+          fontSize: "clamp(1.2rem, 4vw, 2.2rem)",
           fontWeight: "bold",
           background: "linear-gradient(135deg, #667eea, #764ba2)",
           WebkitBackgroundClip: "text",
           WebkitTextFillColor: "transparent",
+          whiteSpace: 'normal',
+          overflowWrap: 'break-word',
+          maxWidth: isMobile ? '60vw' : 'unset',
+          minWidth: 0,
         }}
       >
         JMeterAI
       </div>
 
-      <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+      <div style={{
+        display: "flex",
+        alignItems: "center",
+        gap: "clamp(6px, 2vw, 24px)",
+        flexWrap: 'wrap',
+        minWidth: 0,
+        justifyContent: 'flex-end',
+        marginRight: 'clamp(8px, 2vw, 32px)',
+        boxSizing: 'border-box',
+        maxWidth: '100vw',
+      }}>
         <div
           style={{
             display: "flex",
             alignItems: "center",
-            gap: "8px",
-            padding: "6px 12px",
+            gap: "clamp(4px, 1vw, 12px)",
+            padding: "clamp(2px, 1vw, 8px) clamp(6px, 2vw, 16px)",
             background: isExpiringSoon ? "rgba(255, 152, 0, 0.1)" : "rgba(255, 255, 255, 0.1)",
             borderRadius: "8px",
             border: `1px solid ${isExpiringSoon ? "rgba(255, 152, 0, 0.3)" : "rgba(255, 255, 255, 0.2)"}`,
+            minWidth: 0,
           }}
         >
           <FaClock
@@ -128,19 +168,20 @@ const handleLogout = () => {
               fontSize: "14px",
               fontWeight: "500",
               color: license === "Trial Expired" ? "#f44336" : isExpiringSoon ? "#ff9800" : "rgba(255, 255, 255, 0.7)",
+              minWidth: 0,
             }}
           >
             {license}
           </span>
         </div>
 
-        <div style={{ position: "relative" }}>
+        <div style={{ position: "relative", minWidth: 0 }}>
           <div
             onClick={() => setDropdownOpen((prev) => !prev)}
             style={{
               cursor: "pointer",
-              padding: "12px",
-              paddingBottom: "7px",
+              padding: "clamp(6px, 2vw, 14px)",
+              paddingBottom: "clamp(4px, 1vw, 7px)",
               borderRadius: "10px",
               background: "rgba(255, 255, 255, 0.1)",
               border: "1px solid rgba(255, 255, 255, 0.2)",
@@ -170,8 +211,9 @@ const handleLogout = () => {
                 boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
                 border: "1px solid rgba(255,255,255,0.2)",
                 fontSize: "clamp(0.9rem, 2vw, 1.1rem)",
-                maxWidth: "90vw",
-                wordBreak: "break-word"
+                maxWidth: "98vw",
+                wordBreak: "break-word",
+                right: 0,
               }}
             >
               <div style={{ display: "flex", flexDirection: "column", gap: "clamp(8px, 2vw, 12px)" }}>

@@ -90,37 +90,37 @@ const Dashboard = () => {
       <main
         style={{
           flexGrow: 1,
-          padding: "20px",
-          marginLeft: "0",
-          marginTop: "0",
-          width: `calc(100vw - ${sidebarWidth}px)`,
-          minHeight: "calc(100vh - 80px)",
-          transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-          boxSizing: "border-box",
-          position: "relative",
+          padding: 'clamp(12px, 4vw, 32px) clamp(6px, 3vw, 24px) clamp(24px, 4vw, 40px) clamp(6px, 3vw, 24px)',
+          marginLeft: 0,
+          marginTop: 0,
+          width: '100%',
+          minHeight: 'calc(100vh - 80px)',
+          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+          boxSizing: 'border-box',
+          position: 'relative',
           zIndex: 1,
-          background: "linear-gradient(to bottom, #FFF8F1, #FFF1E6)",
+          background: 'linear-gradient(to bottom, #FFF8F1, #FFF1E6)',
           fontFamily: "'Poppins', sans-serif",
         }}
       >
         <div
           style={{
-            marginBottom: "20px",
-            padding: "24px",
-            width: "100%",
-            boxSizing: "border-box",
-            position: "relative",
+            marginBottom: 'clamp(8px, 2vw, 24px)',
+            padding: 'clamp(18px, 5vw, 40px) clamp(8px, 4vw, 32px) clamp(12px, 3vw, 32px) clamp(8px, 4vw, 32px)',
+            width: '100%',
+            boxSizing: 'border-box',
+            position: 'relative',
           }}
         >
           <svg
             style={{
-              position: "absolute",
-              top: "-40px",
-              left: "-60px",
-              width: "320px",
-              height: "160px",
+              position: 'absolute',
+              top: 'clamp(-18px, -4vw, -8px)',
+              left: 'clamp(-18px, -4vw, -8px)',
+              width: 'clamp(140px, 60vw, 320px)',
+              height: 'clamp(70px, 30vw, 160px)',
               zIndex: 0,
-              pointerEvents: "none",
+              pointerEvents: 'none',
             }}
             viewBox="0 0 320 160"
             fill="none"
@@ -139,13 +139,15 @@ const Dashboard = () => {
           <Typography
             variant="h3"
             style={{
-              color: "#FF6D00",
-              fontWeight: "900",
-              marginBottom: "12px",
-              fontSize: "34px",
-              letterSpacing: "0.5px",
-              position: "relative",
+              color: '#FF6D00',
+              fontWeight: 900,
+              marginBottom: 'clamp(4px, 1vw, 12px)',
+              fontSize: 'clamp(1.3rem, 7vw, 2.2rem)',
+              letterSpacing: '0.5px',
+              position: 'relative',
               zIndex: 1,
+              whiteSpace: 'normal',
+              overflowWrap: 'break-word',
             }}
           >
             Dashboard
@@ -153,23 +155,25 @@ const Dashboard = () => {
           <Typography
             variant="h6"
             style={{
-              color: "#333333",
-              fontWeight: "550",
-              fontSize: "16px",
-              fontStyle: "bold",
-              letterSpacing: "0.3px",
-              opacity: "0.85",
-              position: "relative",
+              color: '#333333',
+              fontWeight: 550,
+              fontSize: 'clamp(0.95rem, 3vw, 1.2rem)',
+              fontStyle: 'bold',
+              letterSpacing: '0.3px',
+              opacity: 0.85,
+              position: 'relative',
               zIndex: 1,
+              whiteSpace: 'normal',
+              overflowWrap: 'break-word',
             }}
           >
             Welcome to Dynamic Admin
           </Typography>
         </div>
 
-        <Grid container spacing={2} sx={{ maxWidth: "80%", margin: 0, flexWrap: "wrap" }}>
+        <Grid container spacing={2} sx={{ maxWidth: '100vw', margin: 0, flexWrap: 'wrap', rowGap: 'clamp(2px, 0.5vw, 6px)', columnGap: 'clamp(2px, 0.5vw, 6px)' }}>
           {cards.map((card, index) => (
-            <Grid item xs={12} sm={6} md={4} key={card.id} sx={{ minWidth: 0, flex: "1 1 0" }}>
+            <Grid item xs={12} sm={6} md={4} key={card.id} sx={{ minWidth: 0, flex: '1 1 0', maxWidth: '100vw' }}>
               <Card
                 sx={{
                   background:
@@ -177,7 +181,7 @@ const Dashboard = () => {
                   backdropFilter: "blur(80px)",
                   border: "1px solid rgba(255, 126, 95, 0.2)",
                   borderRadius: "20px",
-                  height: "clamp(180px, 28vw, 240px)",
+                  height: 'clamp(180px, 28vw, 240px)',
                   boxShadow: "0 4px 12px rgba(255, 153, 102, 0.1)",
                   transition: "transform 0.3s ease, box-shadow 0.3s ease",
                   cursor: "pointer",
@@ -187,11 +191,12 @@ const Dashboard = () => {
                     transform: "scale(1.015)",
                     boxShadow: "0 8px 24px rgba(255, 153, 102, 0.2)",
                   },
+                  maxWidth: '100vw',
                 }}
               >
                 <CardContent
                   sx={{
-                    padding: "clamp(16px, 3vw, 28px)",
+                    padding: 'clamp(16px, 3vw, 28px)',
                     height: "100%",
                     position: "relative",
                     zIndex: 2,
@@ -305,6 +310,88 @@ const Dashboard = () => {
           100% {
             opacity: 1;
             transform: translateY(0);
+          }
+        }
+        @media (max-width: 1024px) {
+          .MuiGrid-container {
+            row-gap: clamp(10px, 2vw, 24px) !important;
+            column-gap: clamp(10px, 2vw, 24px) !important;
+          }
+          .MuiGrid-item {
+            max-width: 100vw !important;
+            min-width: 0 !important;
+          }
+        }
+        @media (max-width: 900px) {
+          .MuiTypography-h6 {
+            white-space: normal !important;
+            text-overflow: unset !important;
+            word-break: break-word !important;
+          }
+          .MuiGrid-container {
+            row-gap: clamp(8px, 2vw, 16px) !important;
+            column-gap: clamp(8px, 2vw, 16px) !important;
+          }
+          .MuiGrid-item {
+            max-width: 100vw !important;
+            min-width: 0 !important;
+          }
+        }
+        @media (max-width: 600px) {
+          main {
+            padding: clamp(8px, 2vw, 16px) clamp(2px, 2vw, 8px) clamp(16px, 4vw, 32px) clamp(2px, 2vw, 8px) !important;
+          }
+          .MuiGrid-container {
+            row-gap: clamp(6px, 2vw, 10px) !important;
+            column-gap: clamp(6px, 2vw, 10px) !important;
+            flex-direction: column !important;
+            align-items: center !important;
+          }
+          .MuiGrid-item {
+            max-width: 100vw !important;
+            min-width: 0 !important;
+            width: 90% !important;
+            margin: 0 auto clamp(12px, 2vw, 20px) auto !important;
+          }
+          .MuiCard-root {
+            width: 100% !important;
+            max-width: 100vw !important;
+            min-width: 0 !important;
+            padding: clamp(8px, 2vw, 14px) !important;
+          }
+          .MuiCardContent-root {
+            padding: clamp(8px, 2vw, 14px) !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
+            min-height: 120px !important;
+          }
+          .MuiTypography-h6, .MuiTypography-h3, .MuiTypography-body2 {
+            font-size: clamp(0.9rem, 4vw, 1.1rem) !important;
+            white-space: normal !important;
+            word-break: break-word !important;
+            overflow-wrap: break-word !important;
+            text-align: center !important;
+          }
+          .MuiTypography-h3 {
+            font-size: clamp(1.1rem, 6vw, 1.5rem) !important;
+          }
+          .MuiSvgIcon-root, .MuiBox-root[style*='font-size'] {
+            font-size: clamp(1.2rem, 8vw, 2.2rem) !important;
+          }
+        }
+        @media (max-width: 480px) {
+          main {
+            padding: clamp(6px, 2vw, 10px) clamp(1px, 2vw, 4px) clamp(12px, 4vw, 24px) clamp(1px, 2vw, 4px) !important;
+          }
+          .MuiGrid-container {
+            row-gap: clamp(4px, 2vw, 8px) !important;
+            column-gap: clamp(4px, 2vw, 8px) !important;
+          }
+          .MuiGrid-item {
+            max-width: 100vw !important;
+            min-width: 0 !important;
           }
         }
         @media (max-width: 900px) {

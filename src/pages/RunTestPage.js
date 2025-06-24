@@ -366,6 +366,27 @@ const RunTestPage = () => {
           opacity: 0.6;
           cursor: not-allowed;
         }
+        @media (max-width: 1024px) {
+          .tp-panels {
+            flex-direction: column !important;
+            gap: clamp(8px, 2vw, 16px) !important;
+            align-items: stretch !important;
+          }
+          .tp-panel, .tp-panel-history, .tp-panel-chat {
+            min-width: 0 !important;
+            max-width: 100vw !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
+          }
+        }
+        @media (min-width: 1025px) {
+          .tp-main {
+            margin-left: clamp(8px, 2vw, 20px);
+          }
+          .tp-panel.tp-panel-chat {
+            max-width: clamp(580px, 56vw, 780px) !important;
+          }
+        }
       `}</style>
 
       <div className="tp-main" style={{

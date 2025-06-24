@@ -4,6 +4,7 @@ import { Zap, Check, Shield, Headphones, ArrowRight, CreditCard, DollarSign } fr
 import Sidebar from '../../components/Sidebar';
 import Header from '../../components/Header';
 import { LoginRequiredModal, checkAuthentication } from '../../components/VerifiedPopup';
+import useResponsive from '../../useResponsive';
 
 const currenciesWithRates = [
   { code: "INR", rate: 1 },
@@ -41,7 +42,7 @@ const currenciesWithRates = [
 const features = [
   { icon: <Zap />, title: "Unlimited Tests", description: "Run as many tests as you need without any restrictions." },
   { icon: <Check />, title: "Advanced Analytics", description: "Dive deep into performance metrics with detailed reports." },
-  { icon: <Shield />, title: "Priority Support", description: "Get 24/7 dedicated support for any issues or questions." },
+ 
   { icon: <CreditCard />, title: "Multiple Payment Methods", description: "Pay with credit card, PayPal, or cryptocurrency." },
   { icon: <DollarSign />, title: "Cost Savings", description: "Save up to 40% compared to other performance testing tools." },
 ];
@@ -59,6 +60,8 @@ function PaymentPage() {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(checkAuthentication());
   
+  const { isXs, isSm } = useResponsive();
+  const isMobile = isXs || isSm;
   const sidebarWidth = sidebarOpen || sidebarHovered ? 280 : 70;
   const basePricePerMonthINR = 40000;
   const discountedPricePerMonthINR = 20000;
@@ -181,6 +184,7 @@ function PaymentPage() {
 
       {/* Sidebar Component */}
       <Sidebar
+        isMobile={isMobile}
         sidebarOpen={sidebarOpen}
         setSidebarOpen={setSidebarOpen}
         sidebarHovered={sidebarHovered}
@@ -190,7 +194,7 @@ function PaymentPage() {
       {/* Main Content Wrapper */}
       <div style={{
         flex: 1,
-        marginLeft: "-20px",
+        marginLeft: isMobile ? 0 : "-20px",
         transition: 'margin-left 0.3s ease',
         display: 'flex',
         flexDirection: 'column',
@@ -200,19 +204,7 @@ function PaymentPage() {
       
 
         {/* Content Container */}
-        <main style={{
-          flexGrow: 1,
-          padding: "20px",
-          marginLeft: "12px",
-          marginTop: "-15px",
-          width: `calc(100vw - ${sidebarWidth + 20}px)`,
-          minHeight: "calc(100vh - 80px)",
-          transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-          boxSizing: "border-box",
-          position: "relative",
-          zIndex: 1,
-          background: "linear-gradient(to bottom, #FFF8F1, #FFF1E6)"
-        }}>
+        <main className="payment-main-content">
           {/* Header Section with enhanced animations */}
           <div style={{
             marginBottom: "20px",
@@ -590,9 +582,9 @@ function PaymentPage() {
             </div>
 
             {/* Enhanced Features Grid */}
-            <div style={{
+            <div className="features-grid" style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+              gridTemplateColumns: 'repeat(4, 1fr)',
               gap: '24px',
               margin: '40px 0'
             }}>
@@ -697,7 +689,7 @@ function PaymentPage() {
                 {[
                   { icon: <Shield />, text: "SSL Secured" },
                   { icon: <Check />, text: "30-Day Money Back" },
-                  { icon: <Headphones />, text: "24/7 Support" }
+                
                 ].map((item, index) => (
                   <div
                     key={index}
@@ -743,6 +735,23 @@ function PaymentPage() {
           </div>
         </main>
       </div>
+
+      {/* Mobile overlay for sidebar */}
+      {isMobile && sidebarOpen && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0, 0, 0, 0.5)',
+            zIndex: 1198,
+            transition: 'opacity 0.3s ease'
+          }}
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
 
       <style jsx global>{`
         body {
@@ -815,15 +824,67 @@ function PaymentPage() {
         @media (max-width: 600px) {
           main {
             padding: clamp(6px, 2vw, 8px) !important;
+            width: 100vw !important;
+            max-width: 100vw !important;
           }
           .pricing-card {
-            max-width: clamp(280px, 98vw, 350px) !important;
+            max-width: 100vw !important;
+            width: 100% !important;
+            margin: 0 auto clamp(16px, 2vw, 24px) auto !important;
+            padding: clamp(12px, 2vw, 18px) !important;
           }
           .features-grid {
-            gap: clamp(8px, 2vw, 12px) !important;
+            grid-template-columns: 1fr !important;
+          }
+          .features-grid > div {
+            width: 100% !important;
+            max-width: 100vw !important;
+            min-width: 0 !important;
+            padding: clamp(10px, 2vw, 16px) !important;
+            text-align: center !important;
+            word-break: break-word !important;
+            white-space: normal !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
+          }
+          .features-grid h3, .features-grid p {
+            text-align: center !important;
+            white-space: normal !important;
+            word-break: normal !important;
+            overflow-wrap: anywhere !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            margin: 0 auto clamp(6px, 1vw, 12px) auto !important;
+          }
+          .features-grid h3 {
+            font-size: clamp(1rem, 4vw, 1.2rem) !important;
+          }
+          .features-grid p {
+            font-size: clamp(0.95rem, 3vw, 1.1rem) !important;
           }
           .trust-indicators {
+            flex-direction: column !important;
             gap: clamp(12px, 3vw, 20px) !important;
+            width: 100vw !important;
+            max-width: 100vw !important;
+            margin: 0 auto clamp(16px, 2vw, 24px) auto !important;
+          }
+          .trust-indicators > div {
+            width: 100% !important;
+            max-width: 100vw !important;
+            min-width: 0 !important;
+            text-align: center !important;
+            word-break: break-word !important;
+            white-space: normal !important;
+          }
+          h1, h3, p, label, span, input, select, button {
+            font-size: clamp(0.95rem, 4vw, 1.1rem) !important;
+            white-space: normal !important;
+            word-break: break-word !important;
+            overflow-wrap: break-word !important;
+            text-align: center !important;
           }
         }
         @media (max-width: 480px) {
@@ -863,6 +924,30 @@ function PaymentPage() {
           background: #ccc !important;
           box-shadow: none !important;
           transform: none !important;
+        }
+        .payment-main-content {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: flex-start;
+          margin: 0 auto;
+          width: 100%;
+          max-width: 100vw;
+          min-height: 100vh;
+          box-sizing: border-box;
+          padding: clamp(12px, 4vw, 32px) clamp(6px, 3vw, 24px) clamp(24px, 4vw, 40px) clamp(6px, 3vw, 24px);
+        }
+        @media (max-width: 1024px) {
+          .payment-main-content {
+            padding: clamp(10px, 3vw, 24px) clamp(4px, 2vw, 12px) clamp(16px, 4vw, 32px) clamp(4px, 2vw, 12px);
+          }
+        }
+        @media (max-width: 600px) {
+          .payment-main-content {
+            padding: clamp(8px, 2vw, 16px) clamp(2px, 2vw, 8px) clamp(12px, 4vw, 24px) clamp(2px, 2vw, 8px);
+            width: 100vw !important;
+            max-width: 100vw !important;
+          }
         }
       `}</style>
     </div>
