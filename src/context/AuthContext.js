@@ -9,10 +9,10 @@ export function AuthProvider({ children }) {
   const [isAuthenticated, setIsAuthenticated] = useState(checkAuthentication());
   const [user, setUser] = useState(getCurrentUser());
 
-  const updateAuth = () => {
-    setIsAuthenticated(checkAuthentication());
-    setUser(getCurrentUser());
-  };
+    const updateAuth = () => {
+      setIsAuthenticated(checkAuthentication());
+      setUser(getCurrentUser());
+    };
   useEffect(() => {
     externalUpdateAuth = updateAuth;
     window.addEventListener("storage", updateAuth);

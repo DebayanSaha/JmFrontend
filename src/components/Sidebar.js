@@ -85,88 +85,88 @@ function Sidebar({ isMobile, sidebarOpen, setSidebarOpen }) {
           &times;
         </button>
       )}
-      <div style={{ height: "100%", display: "flex", flexDirection: "column" }}>
-        {/* User Profile Section */}
-        <div
-          style={{
-            padding: "20px",
-            margin: "8px 12px",
-            borderRadius: "12px",
-            textAlign: "center",
-            background: "rgba(255, 255, 255, 0.08)",
-            backdropFilter: "blur(10px)",
-            boxShadow: "inset 0 0 0 1px rgba(255, 255, 255, 0.1)",
-            transition: "all 0.3s",
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = "rgba(255, 255, 255, 0.15)";
-            e.currentTarget.style.transform = "scale(1.03)";
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = "rgba(255, 255, 255, 0.08)";
-            e.currentTarget.style.transform = "scale(1)";
-          }}
-        >
+        <div style={{ height: "100%", display: "flex", flexDirection: "column" }}>
+          {/* User Profile Section */}
           <div
             style={{
-              width: "60px",
-              height: "60px",
-              borderRadius: "50%",
-              background: "#ffe7cc",
-              margin: "0 auto 12px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
+              padding: "20px",
+              margin: "8px 12px",
+              borderRadius: "12px",
+              textAlign: "center",
+              background: "rgba(255, 255, 255, 0.08)",
+              backdropFilter: "blur(10px)",
+              boxShadow: "inset 0 0 0 1px rgba(255, 255, 255, 0.1)",
+              transition: "all 0.3s",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = "rgba(255, 255, 255, 0.15)";
+              e.currentTarget.style.transform = "scale(1.03)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = "rgba(255, 255, 255, 0.08)";
+              e.currentTarget.style.transform = "scale(1)";
             }}
           >
-            <PersonIcon style={{ color: "#FF6D00", fontSize: "30px" }} />
+            <div
+              style={{
+                width: "60px",
+                height: "60px",
+                borderRadius: "50%",
+                background: "#ffe7cc",
+                margin: "0 auto 12px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <PersonIcon style={{ color: "#FF6D00", fontSize: "30px" }} />
+            </div>
+            <Typography style={{ color: "#fff", fontWeight: 600 }}>{userData.name}</Typography>
+            <Typography style={{ color: "rgba(255, 255, 255, 0.85)", fontSize: "13px" }}>
+              {userData.organization}
+            </Typography>
           </div>
-          <Typography style={{ color: "#fff", fontWeight: 600 }}>{userData.name}</Typography>
-          <Typography style={{ color: "rgba(255, 255, 255, 0.85)", fontSize: "13px" }}>
-            {userData.organization}
-          </Typography>
-        </div>
 
-        {/* Navigation */}
-        <div style={{ margin: "0 8px", padding: "20px 0" }}>
-          <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
-            {sidebarItems.map((item) => {
-              const isActive = location.pathname === item.path;
-              return (
-                <li key={item.name}>
-                  <Link
-                    to={item.path}
-                    onClick={handleLinkClick}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      padding: "12px 20px",
-                      color: "#fff",
-                      textDecoration: "none",
-                      borderLeft: isActive ? "3px solid #FF6D00" : "3px solid transparent",
-                      background: isActive ? "rgba(255, 255, 255, 0.15)" : "transparent",
-                      borderRadius: "0 8px 8px 0",
-                      transition: "all 0.3s",
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.background = isActive ? "rgba(255, 255, 255, 0.25)" : "rgba(255, 255, 255, 0.1)";
-                      e.currentTarget.style.transform = "translateX(4px)";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.background = isActive ? "rgba(255, 255, 255, 0.15)" : "transparent";
-                      e.currentTarget.style.transform = "translateX(0px)";
-                    }}
-                  >
-                    <i style={{ minWidth: "24px", color: "#FFB74D" }}>{item.icon}</i>
-                    <span style={{ marginLeft: "16px", fontSize: "14px", fontWeight: "500" }}>{item.name}</span>
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
+          {/* Navigation */}
+          <div style={{ margin: "0 8px", padding: "20px 0" }}>
+            <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+              {sidebarItems.map((item) => {
+                const isActive = location.pathname === item.path;
+                return (
+                  <li key={item.name}>
+                    <Link
+                      to={item.path}
+                      onClick={handleLinkClick}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        padding: "12px 20px",
+                        color: "#fff",
+                        textDecoration: "none",
+                        borderLeft: isActive ? "3px solid #FF6D00" : "3px solid transparent",
+                        background: isActive ? "rgba(255, 255, 255, 0.15)" : "transparent",
+                        borderRadius: "0 8px 8px 0",
+                        transition: "all 0.3s",
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = isActive ? "rgba(255, 255, 255, 0.25)" : "rgba(255, 255, 255, 0.1)";
+                        e.currentTarget.style.transform = "translateX(4px)";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = isActive ? "rgba(255, 255, 255, 0.15)" : "transparent";
+                        e.currentTarget.style.transform = "translateX(0px)";
+                      }}
+                    >
+                      <i style={{ minWidth: "24px", color: "#FFB74D" }}>{item.icon}</i>
+                      <span style={{ marginLeft: "16px", fontSize: "14px", fontWeight: "500" }}>{item.name}</span>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
         </div>
-      </div>
-    </aside>
+      </aside>
   );
 }
 

@@ -4,9 +4,8 @@ import { FaUser, FaPowerOff, FaClock, FaCog, FaSignOutAlt } from "react-icons/fa
 import axiosInstance from "../api/axiosInstance";
 import { useAuthContext } from '../context/AuthContext';
 
-const Header = ({ licenseStatus, isMobile, sidebarOpen, setSidebarOpen }) => {
+const Header = ({ licenseStatus, isMobile, sidebarOpen, setSidebarOpen, dropdownOpen, setDropdownOpen }) => {
   const navigate = useNavigate();
-  const [dropdownOpen, setDropdownOpen] = useState(false);
   const [license, setLicense] = useState("Loading...");
   const [isExpiringSoon, setIsExpiringSoon] = useState(false);
   const { isAuthenticated } = useAuthContext();
@@ -63,10 +62,6 @@ const handleLogout = () => {
     window.location.href = "/login";
   }
 };
-
-
-
-
 
   const handleUpgrade = () => {
     setDropdownOpen(false);
@@ -196,125 +191,6 @@ const handleLogout = () => {
               }}
             />
           </div>
-
-          {dropdownOpen && (
-            <div
-              style={{
-                position: "absolute",
-                top: "50px",
-                right: 0,
-                background: "linear-gradient(135deg, rgba(26,26,46,0.98), rgba(22,33,62,0.98))",
-                borderRadius: "12px",
-                padding: "clamp(8px, 2vw, 16px)",
-                minWidth: "clamp(120px, 28vw, 200px)",
-                zIndex: 10001,
-                boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
-                border: "1px solid rgba(255,255,255,0.2)",
-                fontSize: "clamp(0.9rem, 2vw, 1.1rem)",
-                maxWidth: "98vw",
-                wordBreak: "break-word",
-                right: 0,
-              }}
-            >
-              <div style={{ display: "flex", flexDirection: "column", gap: "clamp(8px, 2vw, 12px)" }}>
-                <div 
-                  style={{ 
-                    display: "flex", 
-                    alignItems: "center", 
-                    gap: "10px", 
-                    cursor: "pointer", 
-                    color: "#fff",
-                    padding: "8px",
-                    borderRadius: "6px",
-                    transition: "all 0.2s ease",
-                    ":hover": {
-                      background: "rgba(255, 255, 255, 0.1)"
-                    }
-                  }}
-                  onClick={() => {
-                    setDropdownOpen(false);
-                    navigate('/profile');
-                  }}
-                  onMouseEnter={(e) => {
-                    e.target.style.background = "rgba(255, 255, 255, 0.1)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.background = "transparent";
-                  }}
-                >
-                  <FaUser style={{ color: "#667eea" }} /> Profile Settings
-                </div>
-                {license.includes("Premium") && (
-                  <div 
-                    style={{ 
-                      display: "flex", 
-                      alignItems: "center", 
-                      gap: "10px", 
-                      cursor: "pointer", 
-                      color: "#fff",
-                      padding: "8px",
-                      borderRadius: "6px",
-                      transition: "all 0.2s ease"
-                    }}
-                    onMouseEnter={(e) => {
-                      e.target.style.background = "rgba(255, 255, 255, 0.1)";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.target.style.background = "transparent";
-                    }}
-                  >
-                    <FaClock style={{ color: "#4facfe" }} /> Premium Plan
-                  </div>
-                )}
-                <div
-                  onClick={handleUpgrade}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "10px",
-                    cursor: "pointer",
-                    color: "#fff",
-                    background: "rgba(255,109,0,0.15)",
-                    padding: "8px",
-                    borderRadius: "6px",
-                    transition: "all 0.2s ease"
-                  }}
-                  onMouseEnter={(e) => {
-                    e.target.style.background = "rgba(255,109,0,0.25)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.background = "rgba(255,109,0,0.15)";
-                  }}
-                >
-                  <FaUser style={{ color: "#FF6D00" }} /> Upgrade to Premium
-                </div>
-                <div style={{ height: "1px", background: "rgba(255,255,255,0.1)" }} />
-                {isAuthenticated && (
-                  <div
-                    onClick={handleLogout}
-                    style={{ 
-                      display: "flex", 
-                      alignItems: "center", 
-                      gap: "10px", 
-                      cursor: "pointer", 
-                      color: "#fff",
-                      padding: "8px",
-                      borderRadius: "6px",
-                      transition: "all 0.2s ease"
-                    }}
-                    onMouseEnter={(e) => {
-                      e.target.style.background = "rgba(255, 255, 255, 0.1)";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.target.style.background = "transparent";
-                    }}
-                  >
-                    <FaSignOutAlt style={{ color: "#f5576c" }} /> Sign out
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
         </div>
       </div>
       <style>{`
@@ -445,6 +321,107 @@ const handleLogout = () => {
           }
         }
       `}</style>
+    </div>
+  );
+};
+
+// Export the dropdown as a separate component for use in Layout.js
+export const SettingsDropdown = ({ open, onClose, navigate, license, isAuthenticated, handleLogout, handleUpgrade }) => {
+  if (!open) return null;
+  return (
+    <div
+      style={{
+        position: "fixed",
+        top: 70, // below header
+        right: 32,
+        background: "linear-gradient(135deg, rgba(26,26,46,0.98), rgba(22,33,62,0.98))",
+        borderRadius: "12px",
+        padding: "clamp(8px, 2vw, 16px)",
+        minWidth: "clamp(120px, 28vw, 200px)",
+        zIndex: 99999,
+        boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
+        border: "1px solid rgba(255,255,255,0.2)",
+        fontSize: "clamp(0.9rem, 2vw, 1.1rem)",
+        maxWidth: "98vw",
+        wordBreak: "break-word",
+        right: 0,
+      }}
+    >
+      <div style={{ display: "flex", flexDirection: "column", gap: "clamp(8px, 2vw, 12px)" }}>
+        <div 
+          style={{ 
+            display: "flex", 
+            alignItems: "center", 
+            gap: "10px", 
+            cursor: "pointer", 
+            color: "#fff",
+            padding: "8px",
+            borderRadius: "6px",
+            transition: "all 0.2s ease",
+          }}
+          onClick={() => { onClose(); navigate('/profile'); }}
+          onMouseEnter={e => e.currentTarget.style.background = "rgba(255, 255, 255, 0.1)"}
+          onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+        >
+          <FaUser style={{ color: "#667eea" }} /> Profile Settings
+        </div>
+        {license && license.includes("Premium") && (
+          <div 
+            style={{ 
+              display: "flex", 
+              alignItems: "center", 
+              gap: "10px", 
+              cursor: "pointer", 
+              color: "#fff",
+              padding: "8px",
+              borderRadius: "6px",
+              transition: "all 0.2s ease"
+            }}
+            onMouseEnter={e => e.currentTarget.style.background = "rgba(255, 255, 255, 0.1)"}
+            onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+          >
+            <FaClock style={{ color: "#4facfe" }} /> Premium Plan
+          </div>
+        )}
+        <div
+          onClick={() => { onClose(); handleUpgrade(); }}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "10px",
+            cursor: "pointer",
+            color: "#fff",
+            background: "rgba(255,109,0,0.15)",
+            padding: "8px",
+            borderRadius: "6px",
+            transition: "all 0.2s ease"
+          }}
+          onMouseEnter={e => e.currentTarget.style.background = "rgba(255,109,0,0.25)"}
+          onMouseLeave={e => e.currentTarget.style.background = "rgba(255,109,0,0.15)"}
+        >
+          <FaUser style={{ color: "#FF6D00" }} /> Upgrade to Premium
+        </div>
+        <div style={{ height: "1px", background: "rgba(255,255,255,0.1)" }} />
+        {isAuthenticated && (
+          <div
+            onClick={() => { onClose(); handleLogout(); }}
+            style={{ 
+              display: "flex", 
+              alignItems: "center", 
+              gap: "10px", 
+              cursor: "pointer", 
+              color: "#fff",
+              padding: "8px",
+              borderRadius: "6px",
+              transition: "all 0.2s ease"
+            }}
+            onMouseEnter={e => e.currentTarget.style.background = "rgba(255, 255, 255, 0.1)"}
+            onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+          >
+            <FaSignOutAlt style={{ color: "#f5576c" }} /> Sign out
+          </div>
+        )}
+      </div>
     </div>
   );
 };

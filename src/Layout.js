@@ -1,16 +1,28 @@
 import React, { useState, useEffect } from "react";
-import Header from "./components/Header";
+import Header, { SettingsDropdown } from "./components/Header";
 import Sidebar from "./components/Sidebar";
 import Footer from "./components/Footer";
-import { Outlet } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import { useResponsive } from './useResponsive';
+import ReactDOM from 'react-dom';
 
 function Layout({ licenseStatus }) {
   const { isSm, isXs } = useResponsive();
   const isMobile = isXs || isSm;
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const navigate = useNavigate();
+
+  // You may want to get license, isAuthenticated, handleLogout, handleUpgrade from context or props
+  // For now, pass dummy/placeholder or lift state up as needed
 
   const sidebarWidth = isMobile ? "100%" : "260px";
+
+  // Dummy handlers for dropdown actions (replace with real ones as needed)
+  const license = undefined; // get from context or props if needed
+  const isAuthenticated = undefined; // get from context or props if needed
+  const handleLogout = () => { window.location.href = '/login'; };
+  const handleUpgrade = () => { navigate('/payment'); };
 
   return (
     <div style={{ 
@@ -27,8 +39,22 @@ function Layout({ licenseStatus }) {
         isMobile={isMobile}
         sidebarOpen={sidebarOpen}
         setSidebarOpen={setSidebarOpen}
+        dropdownOpen={dropdownOpen}
+        setDropdownOpen={setDropdownOpen}
       />
-      
+      {/* Settings Dropdown rendered at the end of the DOM tree for priority */}
+      {ReactDOM.createPortal(
+        <SettingsDropdown 
+          open={dropdownOpen} 
+          onClose={() => setDropdownOpen(false)}
+          navigate={navigate}
+          license={license}
+          isAuthenticated={isAuthenticated}
+          handleLogout={handleLogout}
+          handleUpgrade={handleUpgrade}
+        />,
+        document.body
+      )}
       <div style={{ 
         display: 'flex', 
         flexGrow: 1,
