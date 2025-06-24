@@ -6,9 +6,10 @@ import { createPortal } from 'react-dom';
 const VerifiedPopup = () => {
   const [searchParams] = useSearchParams();
   const status = searchParams.get('status');
+  const navigate = useNavigate(); // this was missing too
   const [message, setMessage] = useState('');
   const [icon, setIcon] = useState(null);
-  const [iconColor, setIconColor] = useState('');
+  const [showLoginButton, setShowLoginButton] = useState(false); // <-- this line is the fix
 
   useEffect(() => {
     switch (status) {
@@ -34,44 +35,6 @@ const VerifiedPopup = () => {
     }
   }, [status]);
 
-  return (
-    <div className="popup-container">
-      <div className="popup-card">
-        {icon}
-        <h2 className="popup-heading">Email Verification</h2>
-        <p className="popup-message">{message}</p>
-
-        {showLoginButton && (
-          <button
-            onClick={() => navigate('/login')}
-            style={{
-              marginTop: '20px',
-              padding: '10px 20px',
-              backgroundColor: '#FF6D00',
-              color: 'white',
-              fontSize: '16px',
-              fontWeight: '600',
-              borderRadius: '12px',
-              border: 'none',
-              cursor: 'pointer',
-              boxShadow: '0 4px 10px rgba(255, 109, 0, 0.3)',
-              transition: 'all 0.3s ease',
-            }}
-            onMouseEnter={(e) => {
-              e.target.style.backgroundColor = '#e65c00';
-              e.target.style.transform = 'translateY(-2px)';
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.backgroundColor = '#FF6D00';
-              e.target.style.transform = 'translateY(0)';
-            }}
-          >
-            Go to Login
-          </button>
-        )}
-      </div>
-    </div>
-  );
 };
 
 // Authentication utility functions
