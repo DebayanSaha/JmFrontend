@@ -1,0 +1,115 @@
+{
+  "name": "JmeterAI",
+  "version": "0.1.0",
+  "description": "Testing AI Tool",
+  "author": "JAI Engineers",
+  "private": true,
+  "main": "main.js",
+  "homepage": "./",
+  "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@mui/icons-material": "^5.15.20",
+    "@mui/material": "^5.15.20",
+    "@mui/system": "^5.15.15",
+    "@tailwindcss/cli": "^4.1.10",
+    "@testing-library/dom": "^10.4.0",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.2.0",
+    "@testing-library/user-event": "^13.5.0",
+    "axios": "^1.6.0",
+    "concurrently": "^9.1.2",
+    "force": "^0.0.3",
+    "formik": "^2.4.5",
+    "lucide-react": "^0.476.0",
+    "mui-tel-input": "^3.2.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-hook-form": "^7.57.0",
+    "react-icons": "^5.5.0",
+    "react-markdown": "^9.0.0",
+    "react-phone-input-2": "^2.15.1",
+    "react-router-dom": "^6.16.0",
+    "react-select": "^5.10.1",
+    "rehype-raw": "^7.0.0",
+    "remark-gfm": "^4.0.1",
+    "styled-components": "^5.3.11",
+    "tailwindcss": "^4.1.10",
+    "wait-on": "^8.0.2",
+    "web-vitals": "^2.1.4",
+    "yup": "^1.3.3"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "cross-env": "^7.0.3",
+    "react-scripts": "^5.0.1",
+    "webpack": "^5.98.0"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "start-frontend": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "build": {
+    "extends": null,
+    "productName": "JMeterAI",
+    "files": [
+      "build/**/*",
+      "main.js",
+      "preload.js",
+      "node_modules/**/*",
+      "package.json",
+      "backend/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "../backend/dist/JmeterAI.exe",
+        "to": "JmeterAI.exe"
+      }
+    ],
+    "directories": {
+      "buildResources": "assets",
+      "output": "dist"
+    },
+    "win": {
+      "icon": "public/JmeterAI.ico",
+      "target": [
+        "portable",
+        "nsis"
+      ],
+      "forceCodeSigning": false
+    },
+    "mac": {
+      "target": "dmg",
+      "icon": "iconcompany.icns"
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "icon": "iconcompany.png"
+    },
+    "extraMetadata": {
+      "main": "main.js"
+    },
+    "asar": true,
+    "asarUnpack": [
+      "../backend/dist/JmeterAI.exe"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
