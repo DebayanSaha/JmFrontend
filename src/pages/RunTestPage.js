@@ -661,40 +661,27 @@ const RunTestPage = () => {
             </div>
 
             <div className="tp-history-search" style={{ marginBottom: '16px' }}>
-              <Autocomplete
-                freeSolo
-                options={history.map(item => item.filename)}
+              <TextField
+                placeholder="Search files..."
+                size="small"
                 value={searchQuery}
-                onChange={(event, newValue) => {
-                  setSearchQuery(newValue || "");
+                onChange={e => setSearchQuery(e.target.value)}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: 'var(--tp-radius-sm)',
+                    backgroundColor: 'var(--tp-white)',
+                    '& fieldset': {
+                      borderColor: 'var(--tp-border)',
+                    },
+                    '&:hover fieldset': {
+                      borderColor: 'var(--tp-orange)',
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: 'var(--tp-orange)',
+                    },
+                  },
                 }}
-                onInputChange={(event, newInputValue) => {
-                  setSearchQuery(newInputValue);
-                }}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    placeholder="Search files..."
-                    size="small"
-                    sx={{
-                      '& .MuiOutlinedInput-root': {
-                        borderRadius: 'var(--tp-radius-sm)',
-                        backgroundColor: 'var(--tp-white)',
-                        '& fieldset': {
-                          borderColor: 'var(--tp-border)',
-                        },
-                        '&:hover fieldset': {
-                          borderColor: 'var(--tp-orange)',
-                        },
-                        '&.Mui-focused fieldset': {
-                          borderColor: 'var(--tp-orange)',
-                        },
-                      },
-                    }}
-                  />
-                )}
               />
-
             </div>
 
             <div className="tp-history-list" style={{

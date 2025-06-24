@@ -558,46 +558,27 @@ function IntelligentTestAnalysis() {
               </Typography>
 
               {/* Search Input */}
-              <Autocomplete
-                freeSolo
-                disableClearable={false}
-                clearOnEscape
-                options={(history || []).map(item => item.filename)}
+              <TextField
+                placeholder="Search files..."
+                size="small"
                 value={searchQuery}
-                onChange={(event, newValue) => {
-                  setSearchQuery(newValue || "");
+                onChange={e => setSearchQuery(e.target.value)}
+                InputLabelProps={{ shrink: false }}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: 'var(--tp-radius-sm)',
+                    backgroundColor: 'var(--tp-white)',
+                    '& fieldset': {
+                      borderColor: 'var(--tp-border)',
+                    },
+                    '&:hover fieldset': {
+                      borderColor: 'var(--tp-orange)',
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: 'var(--tp-orange)',
+                    },
+                  },
                 }}
-                onInputChange={(event, newInputValue) => {
-                  setSearchQuery(newInputValue);
-                }}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    placeholder="Search files..."
-                    size="small"
-                    InputLabelProps={{ shrink: false }}
-                    sx={{
-                      '& .MuiOutlinedInput-root': {
-                        borderRadius: 'var(--tp-radius-sm)',
-                        backgroundColor: 'var(--tp-white)',
-                        '& fieldset': {
-                          borderColor: 'var(--tp-border)',
-                        },
-                        '&:hover fieldset': {
-                          borderColor: 'var(--tp-orange)',
-                        },
-                        '&.Mui-focused fieldset': {
-                          borderColor: 'var(--tp-orange)',
-                        },
-                      },
-                    }}
-                  />
-                )}
-                filterOptions={(options, { inputValue }) =>
-                  options.filter((option) =>
-                    option.toLowerCase().includes(inputValue.toLowerCase())
-                  )
-                }
               />
 
 

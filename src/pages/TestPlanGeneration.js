@@ -805,50 +805,27 @@ const TestPlanGeneration = () => {
             <div className="tp-panel-title">History</div>
 
             <div className="tp-history-search">
-              <Autocomplete
-                freeSolo
-                options={history.map(item => item.filename)}
+              <TextField
+                placeholder="Search tests..."
+                size="small"
                 value={searchQuery}
-                onChange={(event, newValue) => setSearchQuery(newValue || "")}
-                onInputChange={(event, newInputValue) => setSearchQuery(newInputValue)}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    placeholder="Search tests..."
-                    size="small"
-                    sx={{
-                      '& .MuiOutlinedInput-root': {
-                        borderRadius: 'var(--tp-radius-sm)',
-                        backgroundColor: 'var(--tp-white)',
-                        '& fieldset': {
-                          borderColor: 'var(--tp-border)',
-                        },
-                        '&:hover fieldset': {
-                          borderColor: 'var(--tp-orange)',
-                        },
-                        '&.Mui-focused fieldset': {
-                          borderColor: 'var(--tp-orange)',
-                        },
-                      },
-                      '& .MuiAutocomplete-clearIndicator': {
-                        backgroundColor: 'transparent !important',
-                        borderRadius: '0 !important',
-                        boxShadow: 'none !important',
-                        '&:hover': {
-                          backgroundColor: 'transparent !important',
-                          boxShadow: 'none !important',
-                        },
-                        '&:focus': {
-                          backgroundColor: 'transparent !important',
-                          boxShadow: 'none !important',
-                        },
-                      }
-                    }}
-
-                  />
-                )}
+                onChange={e => setSearchQuery(e.target.value)}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: 'var(--tp-radius-sm)',
+                    backgroundColor: 'var(--tp-white)',
+                    '& fieldset': {
+                      borderColor: 'var(--tp-border)',
+                    },
+                    '&:hover fieldset': {
+                      borderColor: 'var(--tp-orange)',
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: 'var(--tp-orange)',
+                    },
+                  },
+                }}
               />
-
             </div>
 
             <div className="tp-history-list">
