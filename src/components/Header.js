@@ -8,6 +8,11 @@ const Header = ({ licenseStatus, isMobile, sidebarOpen, setSidebarOpen, dropdown
   const [license, setLicense] = useState("Loading...");
   const [isExpiringSoon, setIsExpiringSoon] = useState(false);
 
+  // Ensure all props are functions or have fallbacks
+  const safeSetSidebarOpen = typeof setSidebarOpen === 'function' ? setSidebarOpen : () => {};
+  const safeSetDropdownOpen = typeof setDropdownOpen === 'function' ? setDropdownOpen : () => {};
+  const safeOnLogout = typeof onLogout === 'function' ? onLogout : () => {};
+
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
 
@@ -50,16 +55,13 @@ const Header = ({ licenseStatus, isMobile, sidebarOpen, setSidebarOpen, dropdown
     localStorage.clear();
     sessionStorage.clear();
    
-    if (onLogout) onLogout(); // notifies AppRouter / parent to re-evaluate auth
+    if (safeOnLogout) safeOnLogout(); // notifies AppRouter / parent to re-evaluate auth
    
     navigate('/login');
   };
 
-
-
-
   const handleUpgrade = () => {
-    setDropdownOpen(false);
+    safeSetDropdownOpen(false);
     navigate("/payment");
   };
 
@@ -103,7 +105,7 @@ const Header = ({ licenseStatus, isMobile, sidebarOpen, setSidebarOpen, dropdown
             display: 'flex',
             alignItems: 'center',
           }}
-          onClick={() => setSidebarOpen(true)}
+          onClick={() => safeSetSidebarOpen(true)}
         >
           <span style={{ fontSize: 'clamp(1.2rem, 5vw, 2rem)', lineHeight: 1 }}>&#9776;</span>
         </button>
@@ -167,7 +169,7 @@ const Header = ({ licenseStatus, isMobile, sidebarOpen, setSidebarOpen, dropdown
 
         <div style={{ position: "relative", minWidth: 0 }}>
           <div
-            onClick={() => setDropdownOpen((prev) => !prev)}
+            onClick={() => safeSetDropdownOpen((prev) => !prev)}
             style={{
               cursor: "pointer",
               padding: "clamp(6px, 2vw, 14px)",
@@ -323,6 +325,13 @@ const Header = ({ licenseStatus, isMobile, sidebarOpen, setSidebarOpen, dropdown
 // Export the dropdown as a separate component for use in Layout.js
 export const SettingsDropdown = ({ open, onClose, navigate, license, handleLogout, handleUpgrade }) => {
   if (!open) return null;
+  
+  // Ensure all handlers are functions
+  const safeOnClose = typeof onClose === 'function' ? onClose : () => {};
+  const safeNavigate = typeof navigate === 'function' ? navigate : () => {};
+  const safeHandleLogout = typeof handleLogout === 'function' ? handleLogout : () => {};
+  const safeHandleUpgrade = typeof handleUpgrade === 'function' ? handleUpgrade : () => {};
+  
   return (
     <div
       style={{
@@ -354,13 +363,13 @@ export const SettingsDropdown = ({ open, onClose, navigate, license, handleLogou
             borderRadius: "6px",
             transition: "all 0.2s ease",
           }}
-          onClick={() => { onClose(); navigate('/profile'); }}
+          onClick={() => { safeOnClose(); safeNavigate('/profile'); }}
           onMouseEnter={e => e.currentTarget.style.background = "rgba(255, 255, 255, 0.1)"}
           onMouseLeave={e => e.currentTarget.style.background = "transparent"}
         >
           <FaUser style={{ color: "#667eea" }} /> Profile Settings
         </div>
-        {license && license.includes("Premium") && (
+        {license && typeof license === 'string' && license.includes("Premium") && (
           <div
             style={{
               display: "flex",
@@ -379,7 +388,7 @@ export const SettingsDropdown = ({ open, onClose, navigate, license, handleLogou
           </div>
         )}
         <div
-          onClick={() => { onClose(); handleUpgrade(); }}
+          onClick={() => { safeOnClose(); safeHandleUpgrade(); }}
           style={{
             display: "flex",
             alignItems: "center",
@@ -398,7 +407,7 @@ export const SettingsDropdown = ({ open, onClose, navigate, license, handleLogou
         </div>
         <div style={{ height: "1px", background: "rgba(255,255,255,0.1)" }} />
         <div
-          onClick={() => { onClose(); handleLogout(); }}
+          onClick={() => { safeOnClose(); safeHandleLogout(); }}
           style={{
             display: "flex",
             alignItems: "center",

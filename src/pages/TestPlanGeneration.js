@@ -111,13 +111,20 @@ const TestPlanGeneration = () => {
     }
   };
 
+  // Utility to safely format dates
+  function formatDateSafe(dateString) {
+    if (!dateString) return "Unknown";
+    const date = new Date(dateString);
+    return isNaN(date.getTime()) ? "Unknown" : date.toLocaleString();
+  }
+
   const fetchHistory = async () => {
     try {
       const res = await axiosInstance.get("/list-files?type=jmx");
 
       const parsedHistory = (res.data || []).map(file => ({
         filename: file.filename,
-        date: new Date(file.last_modified).toLocaleString(),
+        date: formatDateSafe(file.last_modified),
         testType: inferTestType(file.filename),
       }));
       setHistory(parsedHistory);

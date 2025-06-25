@@ -146,6 +146,15 @@ const AppRouter = () => {
   // Prevent rendering until auth is determined
 
   if (loading) return null;
+
+  // Add handleLogout function
+  const handleLogout = () => {
+    localStorage.clear();
+    sessionStorage.clear();
+    setUser(null);
+    setLicenseStatus(null);
+    navigate('/login');
+  };
  
   return (
 <Routes>
@@ -170,7 +179,7 @@ const AppRouter = () => {
 <Route path="/forgot-password" element={!isAuthenticated ? <ForgotAndResetPasswordPage /> : <Navigate to="/dashboard" replace />} />
  
       {/* Protected App Layout */}
-<Route element={<Layout licenseStatus={licenseStatus} />}>
+<Route element={<Layout licenseStatus={licenseStatus} onLogout={handleLogout} />}>
 <Route
 
           path="/dashboard"

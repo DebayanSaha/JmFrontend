@@ -19,6 +19,13 @@ import {
   Paper,
 } from "@mui/material";
 
+// Utility to safely format dates
+function formatDateSafe(dateString) {
+  if (!dateString) return "Unknown";
+  const date = new Date(dateString);
+  return isNaN(date.getTime()) ? "Unknown" : date.toLocaleString();
+}
+
 const RunTestPage = () => {
   const [availableFiles, setAvailableFiles] = useState([]);
   const [selectedFilename, setSelectedFilename] = useState("");
@@ -49,7 +56,7 @@ const RunTestPage = () => {
 
         const parsedHistory = (res.data || []).map(file => ({
           filename: file.filename,
-          date: new Date(file.last_modified).toLocaleString(),
+          date: formatDateSafe(file.last_modified),
         }));
         setHistory(parsedHistory);
 

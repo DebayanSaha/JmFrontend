@@ -40,7 +40,7 @@ function Layout({ licenseStatus, onLogout }) {
           open={dropdownOpen}
           onClose={() => setDropdownOpen(false)}
           navigate={navigate}
-          license={undefined}
+          license={licenseStatus}
           isAuthenticated={true}
           handleLogout={onLogout}
           handleUpgrade={() => navigate('/payment')}

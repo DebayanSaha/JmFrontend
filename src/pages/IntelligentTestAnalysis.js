@@ -20,6 +20,13 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
 
+// Utility to safely format dates
+function formatDateSafe(dateString) {
+  if (!dateString) return "Unknown";
+  const date = new Date(dateString);
+  return isNaN(date.getTime()) ? "Unknown" : date.toLocaleString();
+}
+
 function IntelligentTestAnalysis() {
   const [selectedFilename, setSelectedFilename] = useState("");
   const [analysisResult, setAnalysisResult] = useState(null);
@@ -103,7 +110,7 @@ function IntelligentTestAnalysis() {
         const mdRes = await axiosInstance.get("/list-files?type=md");
         const mdHistory = (mdRes.data || []).map(f => ({
           filename: f.filename,
-          date: new Date(f.last_modified).toLocaleString(),
+          date: formatDateSafe(f.last_modified),
         }));
         setHistory(mdHistory);
       } catch (err) {
