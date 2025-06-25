@@ -54,7 +54,7 @@ function Sidebar({ isMobile, sidebarOpen, setSidebarOpen }) {
     width: isMobile ? "100vw" : 280,
     margin: 0,
     transform: 'none',
-    background: "linear-gradient(180deg, rgba(180, 36, 36, 0.9) 0%, rgba(209, 92, 33, 0.9) 100%)",
+    background: "linear-gradient(180deg, rgba(140, 20, 20, 1) 0%, rgb(162, 72, 27) 100%)",
     backdropFilter: "blur(25px) saturate(1.2)",
     borderRight: "1px solid rgba(255, 255, 255, 0.08)",
     zIndex: isMobile ? 10000 : 1200,

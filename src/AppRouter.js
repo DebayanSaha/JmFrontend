@@ -29,13 +29,16 @@ const AppRouter = () => {
     const initAuth = async () => {
       setNavigate(navigate);
 
-      const userData = localStorage.getItem('user');
       const rememberMe = localStorage.getItem('rememberMe') === 'true';
+      const userData = rememberMe
+        ? localStorage.getItem('user')
+        : sessionStorage.getItem('user');
 
       const evaluateLicense = (data) => {
         const now = new Date();
-        const trialEnd = data.trial_ends_at ? new Date(data.trial_ends_at) : null;
-        const paidEnd = data.paid_ends_at ? new Date(data.paid_ends_at) : null;
+        const parseDateUTC = (str) => str ? new Date(str) : null;
+        const trialEnd = parseDateUTC(data.trial_ends_at);
+        const paidEnd = parseDateUTC(data.paid_ends_at);
 
         if (paidEnd && paidEnd > now) return 'paid';
         if (trialEnd && trialEnd > now) return 'trial';
@@ -49,16 +52,17 @@ const AppRouter = () => {
         localStorage.setItem('isAuthenticated', 'true');
       } else if (rememberMe) {
         try {
-          await axiosInstance.post('/refresh'); // sends cookie
-          const parsedUser = JSON.parse(localStorage.getItem('user'));
-          if (parsedUser) {
-            setUser(parsedUser);
-            setLicenseStatus(evaluateLicense(parsedUser));
+          await axiosInstance.post('/refresh'); // auto uses cookie
+          const refreshedUser = JSON.parse(localStorage.getItem('user'));
+          if (refreshedUser) {
+            setUser(refreshedUser);
+            setLicenseStatus(evaluateLicense(refreshedUser));
             localStorage.setItem('isAuthenticated', 'true');
           }
         } catch (err) {
           console.warn('Token refresh failed. Redirecting to login.');
           localStorage.clear();
+          sessionStorage.clear();
           setUser(null);
           setLicenseStatus(null);
         }
@@ -73,6 +77,7 @@ const AppRouter = () => {
 
     initAuth();
   }, [navigate]);
+
 
 
   // ✅ 2. This one REMAINS AS IS

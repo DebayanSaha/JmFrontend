@@ -72,9 +72,9 @@ const ProfilePage = () => {
       await axiosInstance.post('/delete-account', {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      localStorage.clear();
-      sessionStorage.clear();
-      navigate('/signup');
+    localStorage.clear();
+    sessionStorage.clear();
+    navigate('/signup');
     } catch {
       alert('Failed to delete account.');
     }
@@ -153,7 +153,7 @@ const ProfilePage = () => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [editingPhone, user]);
-  return (
+    return (
     <div style={{ minHeight: '100vh', background: 'linear-gradient(to bottom, #FFF8F1, #FFF1E6)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 32 }}>
       <div ref={cardRef} style={{ width: '100%', maxWidth: 600, margin: 'auto', background: 'rgba(255,255,255,0.98)', borderRadius: 16, boxShadow: '0 8px 24px rgba(0,0,0,0.08)', padding: '40px 24px 32px 24px', display: 'flex', flexDirection: 'column', gap: 0 }}>
         <h2 style={{ color: '#FF6D00', fontWeight: 800, fontSize: 28, textAlign: 'center', marginBottom: 24, letterSpacing: 0.5 }}>
@@ -303,8 +303,8 @@ const ProfilePage = () => {
           .profile-card { padding: 8px 2vw 8px 2vw !important; }
         }
       `}</style>
-    </div>
-  );
+      </div>
+    );
 };
 
 const SectionTitle = ({ children }) => (
@@ -340,27 +340,27 @@ const InfoRow = ({ icon, label, value, originalValue,
         verticalAlign: 'middle',
       }}>{React.cloneElement(icon, { size: 16, style: { color: '#FF6D00', verticalAlign: 'middle' } })}</span>
       <span style={{ color: '#888', fontWeight: 500, fontSize: 14, minWidth: 70 }}>{label}:</span>
-    </div>
+          </div>
     <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0, flex: 1, justifyContent: 'flex-end' }}>
       {editable ? (
         editing ? (
-          <>
-            <input
-              type="text"
+              <>
+                <input
+                  type="text"
               value={value}
               onChange={e => onChange(e.target.value)}
-              style={{
-                fontFamily: 'inherit',
-                fontSize: 15,
-                border: '1.5px solid #E0E0E0',
-                borderRadius: 8,
-                padding: '6px 12px',
-                background: '#FFF8F1',
-                color: '#222',
+                  style={{
+                    fontFamily: 'inherit',
+                    fontSize: 15,
+                    border: '1.5px solid #E0E0E0',
+                    borderRadius: 8,
+                    padding: '6px 12px',
+                    background: '#FFF8F1',
+                    color: '#222',
                 minWidth: 120,
                 marginRight: 6,
-              }}
-              autoFocus
+                  }}
+                  autoFocus
             />
             <span
               onMouseDown={e => { e.preventDefault(); onSave(); }}
@@ -370,9 +370,9 @@ const InfoRow = ({ icon, label, value, originalValue,
             >
               <CheckCircle2 size={18} />
             </span>
-          </>
-        ) : (
-          <>
+              </>
+            ) : (
+              <>
             <span style={{ color: '#222', fontWeight: 600, fontSize: 15, textAlign: 'right', minWidth: 80 }}>{value || '-'}</span>
             <span
               onClick={() => setEditing(true)}
@@ -414,9 +414,9 @@ const InfoRow = ({ icon, label, value, originalValue,
         >
           {buttonText}
         </button>
-      )}
-    </div>
-  </div>
+            )}
+          </div>
+            </div>
 );
 
 const CardStatusRow = ({ icon, verified, network, last4, cardStatus, onButtonClick }) => (
@@ -434,7 +434,7 @@ const CardStatusRow = ({ icon, verified, network, last4, cardStatus, onButtonCli
         verticalAlign: 'middle',
       }}>{React.cloneElement(icon, { size: 16, style: { color: '#FF6D00', verticalAlign: 'middle' } })}</span>
       <span style={{ color: '#888', fontWeight: 500, fontSize: 14, minWidth: 70 }}>Card:</span>
-    </div>
+          </div>
     <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0, flex: 1, justifyContent: 'flex-end' }}>
       {verified ? (
         <span style={{ color: '#222', fontWeight: 600, fontSize: 15, textAlign: 'right', minWidth: 80 }}>{network} •••• {last4}</span>
@@ -468,15 +468,15 @@ const CardStatusRow = ({ icon, verified, network, last4, cardStatus, onButtonCli
             Verify Card
           </button>
         </>
-      )}
-    </div>
-  </div>
+          )}
+        </div>
+      </div>
 );
 
 const StatusMessage = ({ status }) => (
   <div style={{ color: status.type === 'success' ? '#10B981' : '#EF4444', fontWeight: 500, marginTop: 2, display: 'flex', alignItems: 'center', gap: 6, fontStyle: status.type === 'error' ? 'italic' : 'normal', fontSize: 13 }}>
     {status.type === 'success' ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />} {status.message}
-  </div>
-);
+    </div>
+  );
 
-export default ProfilePage;
+export default ProfilePage; 
