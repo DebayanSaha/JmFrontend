@@ -142,7 +142,7 @@ function PaymentPage() {
   return (
     <div style={{
       minHeight: '100vh',
-      background: 'linear-gradient(to bottom, #FFF8F1, #FFF1E6)',
+      background: 'linear-gradient(to bottom, #FFE9D0, #FFF3E0)' ,
       display: 'flex',
       overflow: 'hidden',
       fontFamily: "'Poppins', 'Inter', 'Segoe UI', Arial, sans-serif"

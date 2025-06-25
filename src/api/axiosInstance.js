@@ -21,20 +21,17 @@ axiosInstance.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    // Retry once on 401
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    const isRefreshEndpoint = originalRequest.url?.includes('/refresh');
+
+    if (error.response?.status === 401 && !originalRequest._retry && !isRefreshEndpoint) {
       originalRequest._retry = true;
 
       try {
-        // Call refresh endpoint (sends refresh token via cookie)
-        await axiosInstance.post('/refresh');
-
-        // Retry original request after refresh success
-        return axiosInstance(originalRequest);
+        await axiosInstance.post('/refresh'); // sends refresh cookie
+        return axiosInstance(originalRequest); // retry original request
       } catch (refreshError) {
         console.warn("Refresh failed during 401:", refreshError);
 
-        // Clear storage and redirect to login
         localStorage.clear();
         sessionStorage.clear();
 
@@ -49,5 +46,6 @@ axiosInstance.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
 
 export default axiosInstance;

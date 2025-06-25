@@ -59,124 +59,87 @@ const AppRouter = () => {
   // 1️⃣ Auth initialization logic
 
   useEffect(() => {
+  const initAuth = async () => {
+    setNavigate(navigate);
+    setLoading(true);
 
-    const initAuth = async () => {
+    const rememberMe = localStorage.getItem('rememberMe') === 'true';
+    const storedUser = rememberMe
+      ? localStorage.getItem('user')
+      : sessionStorage.getItem('user');
 
-      setNavigate(navigate);
+    if (storedUser) {
+      const parsedUser = JSON.parse(storedUser);
+      setUser(parsedUser);
+      setLicenseStatus(evaluateLicense(parsedUser));
+      localStorage.setItem('isAuthenticated', 'true');
+    } else if (rememberMe) {
+      try {
+        // Only try refresh ONCE
+        const res = await axiosInstance.post('/refresh'); // refresh token sent via cookie
+        const refreshedUser = localStorage.getItem('user'); // backend does not send new user info — consider fixing that
 
-      setLoading(true);
- 
-      const rememberMe = localStorage.getItem('rememberMe') === 'true';
-
-      const storedUser = rememberMe
-
-        ? localStorage.getItem('user')
-
-        : sessionStorage.getItem('user');
- 
-      if (storedUser) {
-
-        const parsedUser = JSON.parse(storedUser);
-
-        setUser(parsedUser);
-
-        setLicenseStatus(evaluateLicense(parsedUser));
-
-        localStorage.setItem('isAuthenticated', 'true');
-
-      } else if (rememberMe) {
-
-        try {
-
-          await axiosInstance.post('/refresh'); // uses cookie for refresh
-
-          const refreshedUser = JSON.parse(localStorage.getItem('user'));
-
-          if (refreshedUser) {
-
-            setUser(refreshedUser);
-
-            setLicenseStatus(evaluateLicense(refreshedUser));
-
-            localStorage.setItem('isAuthenticated', 'true');
-
-          }
-
-        } catch (err) {
-
-          console.warn('Token refresh failed. Redirecting to login.');
-
-          localStorage.clear();
-
-          sessionStorage.clear();
-
+        if (refreshedUser) {
+          const parsedUser = JSON.parse(refreshedUser);
+          setUser(parsedUser);
+          setLicenseStatus(evaluateLicense(parsedUser));
+          localStorage.setItem('isAuthenticated', 'true');
+        } else {
+          // fallback if user data not refreshed
           setUser(null);
-
           setLicenseStatus(null);
-
         }
-
-      } else {
-
-        localStorage.removeItem('isAuthenticated');
-
+      } catch (err) {
+        console.warn('Token refresh failed. Redirecting to login.');
+        localStorage.clear();
+        sessionStorage.clear();
         setUser(null);
-
         setLicenseStatus(null);
-
       }
- 
-      setLoading(false);
+    } else {
+      localStorage.removeItem('isAuthenticated');
+      setUser(null);
+      setLicenseStatus(null);
+    }
 
-    };
- 
-    initAuth();
+    setLoading(false);
+  };
 
-  }, [navigate, loginTriggered]); // rerun on login
+  initAuth();
+}, [navigate, loginTriggered]);
+
  
   // 2️⃣ Redirect root path `/` to `/login` after auth init
 
   useEffect(() => {
-
     if (!loading && window.location.pathname === '/') {
 
       navigate('/login', { replace: true });
-
     }
 
   }, [loading, navigate]);
  
   // 3️⃣ Handle login success
-
   const handleLoginSuccess = (userData) => {
+  const rememberMe = localStorage.getItem('rememberMe') === 'true';
 
-    const rememberMe = localStorage.getItem('rememberMe') === 'true';
- 
-    if (rememberMe) {
+  if (rememberMe) {
+    localStorage.setItem('user', JSON.stringify(userData));
+  } else {
+    sessionStorage.setItem('user', JSON.stringify(userData));
+  }
 
-      localStorage.setItem('user', JSON.stringify(userData));
+  localStorage.setItem('isAuthenticated', 'true');
+  setUser(userData);
+  setLicenseStatus(evaluateLicense(userData));
+  setLoginTriggered(prev => !prev); // retrigger auth flow
 
-    } else {
+  const publicPaths = ['/login', '/signup', '/forgot-password', '/verified-popup'];
+  const redirectTo = publicPaths.includes(initialPath) ? '/dashboard' : initialPath;
 
-      sessionStorage.setItem('user', JSON.stringify(userData));
+  navigate(redirectTo);
+};
 
-    }
- 
-    localStorage.setItem('isAuthenticated', 'true');
-
-    setUser(userData);
-
-    setLicenseStatus(evaluateLicense(userData));
-
-    setLoginTriggered(prev => !prev); // trigger reauth
- 
-    const publicPaths = ['/login', '/signup', '/forgot-password', '/verified-popup'];
-
-    const redirectTo = publicPaths.includes(initialPath) ? '/dashboard' : initialPath;
- 
-    navigate(redirectTo);
-
-  };
  
   const isAuthenticated = !!user;
  

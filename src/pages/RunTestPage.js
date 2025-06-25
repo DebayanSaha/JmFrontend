@@ -184,7 +184,7 @@ const RunTestPage = () => {
         }
         .enhanced-bg {
           min-height: 100vh;
-          background: var(--tp-orange-bg);
+         background: linear-gradient(to bottom, #FFE9D0, #FFF3E0);
           font-family: var(--tp-font);
           color: var(--tp-text);
           display: flex;
@@ -355,12 +355,15 @@ const RunTestPage = () => {
 
       <div className="tp-main" style={{
         width: '100%',
-        maxWidth: '1200px',
+        maxWidth: '100vw',
         margin: '0 auto',
         padding: 'clamp(24px, 5vw, 40px) clamp(8px, 3vw, 32px) clamp(32px, 4vw, 48px) clamp(8px, 3vw, 32px)',
         position: 'relative',
         boxSizing: 'border-box',
         minHeight: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        overflowX: 'auto',
       }}>
         {/* Decorative SVG blob behind header */}
         <svg className="tp-header-blob" viewBox="0 0 320 160" fill="none" xmlns="http://www.w3.org/2000/svg" style={{
@@ -416,7 +419,11 @@ const RunTestPage = () => {
           display: 'flex',
           gap: '24px',
           justifyContent: 'center',
-          alignItems: 'flex-start'
+          alignItems: 'flex-start',
+          width: '100%',
+          minWidth: 0,
+          boxSizing: 'border-box',
+          overflowX: 'auto',
         }}>
 
           {/* Test Runner Panel */}

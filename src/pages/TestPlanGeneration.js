@@ -347,7 +347,7 @@ const TestPlanGeneration = () => {
         }
         .enhanced-bg {
           min-height: 100vh;
-          background: var(--tp-orange-bg);
+          background: linear-gradient(rgb(255, 233, 208), rgb(255, 243, 224));
           font-family: var(--tp-font);
           color: var(--tp-text);
           display: flex;
@@ -361,6 +361,7 @@ const TestPlanGeneration = () => {
           padding: 70px 16px 32px 16px;
           position: relative;
           z-index: 1;
+          background: linear-gradient(rgb(255, 233, 208), rgb(255, 243, 224));
         }
         .tp-header-blob {
           position: absolute;

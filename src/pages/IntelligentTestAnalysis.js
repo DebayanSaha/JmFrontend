@@ -132,7 +132,7 @@ function IntelligentTestAnalysis() {
         }
         .enhanced-bg {
           min-height: 100vh;
-          background: var(--tp-orange-bg);
+          background: linear-gradient(to bottom, #FFE9D0, #FFF3E0);
           font-family: var(--tp-font);
           color: var(--tp-text);
           display: flex;
@@ -282,17 +282,16 @@ function IntelligentTestAnalysis() {
 
       <div className="tp-main" style={{
         width: "100%",
-        maxWidth: "1200px",
+        maxWidth: "100vw",
         margin: "0 auto",
         padding: "clamp(12px, 4vw, 32px) clamp(6px, 3vw, 24px) clamp(24px, 4vw, 40px) clamp(6px, 3vw, 24px)",
         position: "relative",
         zIndex: 1,
         boxSizing: "border-box",
-        maxWidth: "100vw",
-        overflowX: "hidden",
         minHeight: "100vh",
         display: 'flex',
         flexDirection: 'column',
+        overflowX: 'auto',
       }}>
         {/* Decorative SVG blob behind header */}
         <svg className="tp-header-blob" viewBox="0 0 320 160" fill="none" xmlns="http://www.w3.org/2000/svg" style={{
@@ -349,11 +348,13 @@ function IntelligentTestAnalysis() {
             width: "100%",
             margin: 0,
             marginBottom: "-10px",
-            maxWidth: "100%",
+            maxWidth: "100vw",
             boxSizing: "border-box",
             borderRadius: "16px",
             padding: "-15px",
-            transition: "all 0.3s ease-in-out"
+            transition: "all 0.3s ease-in-out",
+            minWidth: 0,
+            overflowX: 'auto',
           }}
         >
           {/* File Selection & Actions Panel */}

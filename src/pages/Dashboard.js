@@ -87,20 +87,18 @@ const Dashboard = () => {
 
   return (
     <>
-      <main
+      <div
         style={{
-          flexGrow: 1,
-          padding: "20px",
-          marginLeft: "0",
-          marginTop: "0",
-          width: `calc(100vw - ${sidebarWidth}px)`,
-          minHeight: "calc(100vh - 80px)",
-          transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-          boxSizing: "border-box",
-          position: "relative",
-          zIndex: 1,
-          background: "linear-gradient(to bottom, #FFF8F1, #FFF1E6)",
+          display: 'flex',
+          flexDirection: 'column',
+          flex: 1,
+          minHeight: 'calc(100vh - 80px)',
+          width: '100%',
+          maxWidth: '100vw',
+          boxSizing: 'border-box',
+          background: 'linear-gradient(to bottom, #FFE9D0, #FFF3E0)',
           fontFamily: "'Poppins', sans-serif",
+          overflowX: 'hidden',
         }}
       >
         <div
@@ -142,10 +140,12 @@ const Dashboard = () => {
               color: "#FF6D00",
               fontWeight: "900",
               marginBottom: "12px",
-              fontSize: "34px",
+              fontSize: "clamp(1.5rem, 4vw, 2.5rem)",
               letterSpacing: "0.5px",
               position: "relative",
               zIndex: 1,
+              marginLeft: 'clamp(8px, 2vw, 32px)',
+              marginTop: 'clamp(12px, 2vw, 32px)',
             }}
           >
             Dashboard
@@ -161,156 +161,155 @@ const Dashboard = () => {
               opacity: "0.85",
               position: "relative",
               zIndex: 1,
+              marginLeft: 'clamp(8px, 2vw, 32px)',
+             
             }}
           >
             Welcome to Dynamic Admin
           </Typography>
         </div>
 
-        <Box
-          sx={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: 2, // spacing between cards (theme spacing unit)
-            justifyContent: 'center', // optional: center-align cards
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+            gap: 'clamp(10px, 0.5vw, 20px)',
+            width: '100%',
+            boxSizing: 'border-box',
+            padding: 'clamp(8px, 3vw, 50px)',
+            overflowX: 'auto',
+            alignItems: 'stretch',
           }}
         >
-
           {cards.map((card, index) => (
-            <Box
+            <Card
               key={card.id}
               sx={{
-                flex: '1 1 300px', // minimum width
-                maxWidth: '300px', // match clamp upper bound
+                background: 'linear-gradient(135deg, #fff 0%, #fff 100%)',
+                backdropFilter: 'blur(80px)',
+                border: '1px solid rgba(255, 126, 95, 0.2)',
+                borderRadius: '20px',
+                minWidth: 0,
+                width: '90%',
+                height: 'clamp(180px, 28vw, 240px)',
+                boxShadow: '0 4px 12px rgba(255, 153, 102, 0.1)',
+                transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                cursor: 'pointer',
+                overflow: 'hidden',
                 display: 'flex',
-                justifyContent: 'center',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+                '&:hover': {
+                  transform: 'scale(1.015)',
+                  boxShadow: '0 8px 24px rgba(255, 153, 102, 0.2)',
+                },
               }}
             >
-              <Card
+              <CardContent
                 sx={{
-                  background: 'linear-gradient(135deg, #fff 0%, #fff 100%)',
-                  backdropFilter: 'blur(80px)',
-                  border: '1px solid rgba(255, 126, 95, 0.2)',
-                  borderRadius: '20px',
-                  width: 'clamp(300px, 50vw, 420px)', // responsive width
-                  height: 'clamp(180px, 28vw, 240px)',
-                  boxShadow: '0 4px 12px rgba(255, 153, 102, 0.1)',
-                  transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-                  cursor: 'pointer',
-                  overflow: 'hidden',
-                  animation: `fadeInUp 0.6s ease ${index * 0.1}s both`,
-                  '&:hover': {
-                    transform: 'scale(1.015)',
-                    boxShadow: '0 8px 24px rgba(255, 153, 102, 0.2)',
-                  },
+                  padding: "clamp(16px, 3vw, 28px)",
+                  height: "100%",
+                  position: "relative",
+                  zIndex: 2,
                 }}
               >
-                <CardContent
+                <IconButton
+                  onClick={() => handleRemoveCard(card.id)}
                   sx={{
-                    padding: "clamp(16px, 3vw, 28px)",
-                    height: "100%",
-                    position: "relative",
-                    zIndex: 2,
+                    position: "absolute",
+                    top: "16px",
+                    right: "16px",
+                    color: "#FF6D00",
+                    background: "rgba(255, 109, 0, 0.1)",
+                    width: "36px",
+                    height: "36px",
+                    transition: "all 0.3s ease",
+                    "&:hover": {
+                      background: "rgba(255, 109, 0, 0.2)",
+                      transform: "rotate(90deg) scale(1.2)",
+                    },
                   }}
                 >
-                  <IconButton
-                    onClick={() => handleRemoveCard(card.id)}
+                  <CloseIcon sx={{ fontSize: "20px" }} />
+                </IconButton>
+
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "16px",
+                    marginBottom: "24px",
+                    marginTop: "8px",
+                  }}
+                >
+                  <Box
                     sx={{
-                      position: "absolute",
-                      top: "16px",
-                      right: "16px",
-                      color: "#FF6D00",
                       background: "rgba(255, 109, 0, 0.1)",
-                      width: "36px",
-                      height: "36px",
-                      transition: "all 0.3s ease",
+                      borderRadius: "16px",
+                      padding: "16px",
+                      flexShrink: 0,
+                      boxShadow: "0 4px 12px rgba(255, 109, 0, 0.1)",
+                      transition: "transform 0.3s ease",
                       "&:hover": {
-                        background: "rgba(255, 109, 0, 0.2)",
-                        transform: "rotate(90deg) scale(1.2)",
+                        transform: "rotate(15deg) scale(1.15)",
                       },
                     }}
                   >
-                    <CloseIcon sx={{ fontSize: "20px" }} />
-                  </IconButton>
-
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "16px",
-                      marginBottom: "24px",
-                      marginTop: "8px",
-                    }}
-                  >
-                    <Box
-                      sx={{
-                        background: "rgba(255, 109, 0, 0.1)",
-                        borderRadius: "16px",
-                        padding: "16px",
-                        flexShrink: 0,
-                        boxShadow: "0 4px 12px rgba(255, 109, 0, 0.1)",
-                        transition: "transform 0.3s ease",
-                        "&:hover": {
-                          transform: "rotate(15deg) scale(1.15)",
-                        },
-                      }}
-                    >
-                      <Box sx={{ fontSize: "32px", color: "#FF6D00" }}>
-                        {card.icon}
-                      </Box>
+                    <Box sx={{ fontSize: "32px", color: "#FF6D00" }}>
+                      {card.icon}
                     </Box>
-                    <Typography
-                      variant="h6"
-                      sx={{
-                        fontSize: "clamp(1.1rem, 2vw, 1.25rem)",
-                        fontWeight: "700",
-                        lineHeight: "1.3",
-                        flex: 1,
-                        minWidth: 0,
-                        overflow: "visible",
-                        textOverflow: "unset",
-                        letterSpacing: "0.3px",
-                        color: "#FF6D00",
-                        whiteSpace: "normal",
-                        wordBreak: "break-word",
-                        display: "block",
-                      }}
-                    >
-                      {card.title}
-                    </Typography>
                   </Box>
-
                   <Typography
-                    variant="h3"
+                    variant="h6"
                     sx={{
-                      fontWeight: "900",
-                      marginBottom: "12px",
-                      fontSize: "34px",
-                      letterSpacing: "1px",
-                      color: "#333333",
+                      fontSize: "clamp(1.1rem, 2vw, 1.25rem)",
+                      fontWeight: "700",
+                      lineHeight: "1.3",
+                      flex: 1,
+                      minWidth: 0,
+                      overflow: "visible",
+                      textOverflow: "unset",
+                      letterSpacing: "0.3px",
+                      color: "#FF6D00",
+                      whiteSpace: "normal",
+                      wordBreak: "break-word",
+                      display: "block",
                     }}
                   >
-                    {card.value}
+                    {card.title}
                   </Typography>
+                </Box>
 
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      opacity: 0.95,
-                      fontSize: "14px",
-                      fontWeight: "500",
-                      letterSpacing: "0.2px",
-                      color: "#666666",
-                    }}
-                  >
-                    {card.info}
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Box>
+                <Typography
+                  variant="h3"
+                  sx={{
+                    fontWeight: "900",
+                    marginBottom: "12px",
+                    fontSize: "34px",
+                    letterSpacing: "1px",
+                    color: "#333333",
+                  }}
+                >
+                  {card.value}
+                </Typography>
+
+                <Typography
+                  variant="body2"
+                  sx={{
+                    opacity: 0.95,
+                    fontSize: "14px",
+                    fontWeight: "500",
+                    letterSpacing: "0.2px",
+                    color: "#666666",
+                  }}
+                >
+                  {card.info}
+                </Typography>
+              </CardContent>
+            </Card>
           ))}
-        </Box>
-      </main>
+        </div>
+      </div>
 
       <style>{`
         @keyframes fadeInUp {

@@ -42,24 +42,21 @@ const Header = ({ licenseStatus, isMobile, sidebarOpen, setSidebarOpen, dropdown
 
   const handleLogout = async () => {
     try {
-      await axiosInstance.post("/logout");
-    } catch (err) {
-      console.warn("Logout error:", err);
-    } finally {
-      // Fully clean both storages
-      localStorage.clear();
-      sessionStorage.clear();
- 
-      // Set rememberMe explicitly false
-      localStorage.setItem("rememberMe", "false");
- 
-      delete axiosInstance.defaults.headers.common["Authorization"];
- 
-      // Redirect to login
-      window.location.href = "/login";
+      await axiosInstance.post('/logout');
+    } catch (e) {
+      console.warn("Logout request failed:", e);
     }
+
+    localStorage.clear();
+    sessionStorage.clear();
+
+    if (onLogout) onLogout(); // ✅ safely clear user and license from parent
+
+    navigate('/login');
   };
- 
+
+
+
 
   const handleUpgrade = () => {
     setDropdownOpen(false);
@@ -346,12 +343,12 @@ export const SettingsDropdown = ({ open, onClose, navigate, license, handleLogou
       }}
     >
       <div style={{ display: "flex", flexDirection: "column", gap: "clamp(8px, 2vw, 12px)" }}>
-        <div 
-          style={{ 
-            display: "flex", 
-            alignItems: "center", 
-            gap: "10px", 
-            cursor: "pointer", 
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "10px",
+            cursor: "pointer",
             color: "#fff",
             padding: "8px",
             borderRadius: "6px",
@@ -364,12 +361,12 @@ export const SettingsDropdown = ({ open, onClose, navigate, license, handleLogou
           <FaUser style={{ color: "#667eea" }} /> Profile Settings
         </div>
         {license && license.includes("Premium") && (
-          <div 
-            style={{ 
-              display: "flex", 
-              alignItems: "center", 
-              gap: "10px", 
-              cursor: "pointer", 
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "10px",
+              cursor: "pointer",
               color: "#fff",
               padding: "8px",
               borderRadius: "6px",
@@ -402,11 +399,11 @@ export const SettingsDropdown = ({ open, onClose, navigate, license, handleLogou
         <div style={{ height: "1px", background: "rgba(255,255,255,0.1)" }} />
         <div
           onClick={() => { onClose(); handleLogout(); }}
-          style={{ 
-            display: "flex", 
-            alignItems: "center", 
-            gap: "10px", 
-            cursor: "pointer", 
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "10px",
+            cursor: "pointer",
             color: "#fff",
             padding: "8px",
             borderRadius: "6px",
