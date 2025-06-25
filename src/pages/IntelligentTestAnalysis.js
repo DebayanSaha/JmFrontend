@@ -571,7 +571,8 @@ function IntelligentTestAnalysis() {
               {/* History List */}
               <div style={{
                 maxHeight: "300px",
-                overflowY: "auto"
+                overflowY: "auto",
+                overflowX: "hidden"
               }}>
                 {filteredHistory.length > 0 ? (
                   filteredHistory.map((item, idx) => (
@@ -588,6 +589,8 @@ function IntelligentTestAnalysis() {
                         alignItems: 'center',
                         justifyContent: 'space-between',
                         gap: '8px',
+                        wordBreak: 'break-all',
+                        overflowWrap: 'anywhere',
                       }}
                     >
                       <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>

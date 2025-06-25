@@ -691,7 +691,8 @@ const RunTestPage = () => {
               flexDirection: 'column',
               gap: '16px',
               overflowY: 'auto',
-              maxHeight: '400px'
+              overflowX: 'hidden',
+              maxHeight: '400px',
             }}>
               {filteredHistory.length > 0 ? (
                 filteredHistory.map((item, idx) => (
@@ -706,7 +707,9 @@ const RunTestPage = () => {
                     alignItems: 'center',
                     justifyContent: 'space-between',
                     gap: '8px',
-                    position: 'relative'
+                    position: 'relative',
+                    wordBreak: 'break-all',
+                    overflowWrap: 'anywhere',
                   }}>
                     <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
                       <div className="tp-history-filename" style={{ fontWeight: '600', fontSize: '15px', marginBottom: '4px', color: 'var(--tp-text)', display: 'flex', alignItems: 'center', gap: '6px' }}>

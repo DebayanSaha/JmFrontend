@@ -245,13 +245,22 @@ const TestPlanGeneration = () => {
               />
             </div>
 
-            <div className="tp-history-list">
+            <div className="tp-history-list" style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '16px',
+              overflowY: 'auto',
+              overflowX: 'hidden',
+              maxHeight: '400px',
+              boxShadow: '0 2px 8px 0 rgba(255, 122, 0, 0.04)',
+              position: 'relative',
+            }}>
               {filteredHistory.length > 0 ? (
                 filteredHistory.map((item, index) => (
                   <div
                     className="tp-history-card"
                     key={index}
-                    style={{ cursor: "pointer", display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}
+                    style={{ cursor: "pointer", display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', wordBreak: 'break-all', overflowWrap: 'anywhere' }}
                   >
                     <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
                       <div className="tp-history-filename">{item.filename}</div>
@@ -365,7 +374,7 @@ const TestPlanGeneration = () => {
           width: 100%;
           max-width: 1200px;
           margin: 0 auto;
-          padding: 70px 16px 32px 16px;
+          padding: 70px 16px 44px 30px;
           position: relative;
           z-index: 1;
           background: linear-gradient(rgb(255, 233, 208), rgb(255, 243, 224));
@@ -383,7 +392,7 @@ const TestPlanGeneration = () => {
           background: none;
           border-radius: var(--tp-radius);
           color: var(--tp-orange-dark);
-          padding: 8px 16px 24px 16px;
+          padding: 8px 16px 24px 8px;
           margin-bottom: 8px;
           margin-top: 0;
           margin-left: 0;
