@@ -392,11 +392,11 @@ const RunTestPage = () => {
       <div className="tp-main" style={{
         width: '100%',
         maxWidth: '1200px',
-        margin: '0 ',
-        padding: '65px 16px 32px 16px',
+        margin: '0 auto',
+        padding: 'clamp(24px, 5vw, 40px) clamp(8px, 3vw, 32px) clamp(32px, 4vw, 48px) clamp(8px, 3vw, 32px)',
         position: 'relative',
-        marginTop: '-50px',
-        marginLeft: '12px'
+        boxSizing: 'border-box',
+        minHeight: '100vh',
       }}>
         {/* Decorative SVG blob behind header */}
         <svg className="tp-header-blob" viewBox="0 0 320 160" fill="none" xmlns="http://www.w3.org/2000/svg" style={{
@@ -415,26 +415,34 @@ const RunTestPage = () => {
           background: 'none',
           borderRadius: 'var(--tp-radius)',
           color: 'var(--tp-orange-dark)',
-          padding: '40px 32px 32px 0px',
-          marginBottom: '32px',
+          padding: 'clamp(18px, 5vw, 40px) clamp(8px, 4vw, 32px) clamp(12px, 3vw, 32px) clamp(8px, 4vw, 32px)',
+          marginBottom: 'clamp(0px, 1vw, 32px)',
           position: 'relative',
-          zIndex: 1
+          zIndex: 1,
+          width: '100%',
+          boxSizing: 'border-box',
         }}>
           <div className="tp-header-title" style={{
-            fontSize: '34px',
+            fontSize: 'clamp(1.5rem, 7vw, 2.2rem)',
             fontWeight: '900',
             color: 'var(--tp-orange-dark)',
             marginBottom: '8px',
-            letterSpacing: '0.5px'
+            letterSpacing: '0.5px',
+            whiteSpace: 'normal',
+            overflowWrap: 'break-word',
+            maxWidth: '100%',
+            wordBreak: 'break-word',
           }}>
             Run JMeter Test
           </div>
           <div className="tp-header-desc" style={{
-            fontSize: '16px',
-            fontStyle: 'bold',
+            fontSize: 'clamp(1rem, 3vw, 1.2rem)',
             fontWeight: '550',
+            fontStyle: 'bold',
             opacity: '0.85',
-            color: 'var(--tp-text)'
+            color: 'var(--tp-text)',
+            whiteSpace: 'normal',
+            overflowWrap: 'break-word',
           }}>
             Execute your performance tests seamlessly!
           </div>
