@@ -49,7 +49,7 @@ function Layout({ licenseStatus }) {
           onClose={() => setDropdownOpen(false)}
           navigate={navigate}
           license={license}
-          isAuthenticated={isAuthenticated}
+          isAuthenticated={true}
           handleLogout={handleLogout}
           handleUpgrade={handleUpgrade}
         />,
