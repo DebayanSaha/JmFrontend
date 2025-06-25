@@ -42,16 +42,16 @@ const Header = ({ licenseStatus, isMobile, sidebarOpen, setSidebarOpen, dropdown
 
   const handleLogout = async () => {
     try {
-      await axiosInstance.post('/logout');
+      await axiosInstance.post('/logout');  // 🔁 tells backend to unset JWT cookies
     } catch (e) {
       console.warn("Logout request failed:", e);
     }
-
+   
     localStorage.clear();
     sessionStorage.clear();
-
-    if (onLogout) onLogout(); // ✅ safely clear user and license from parent
-
+   
+    if (onLogout) onLogout(); // notifies AppRouter / parent to re-evaluate auth
+   
     navigate('/login');
   };
 
