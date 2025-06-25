@@ -29,62 +29,52 @@ const LoginPage = ({ onLoginSuccess }) => {
   }, [setValue]);
 
   const onSubmit = async (data) => {
-  setIsSubmitting(true);
-  setStatus({});
+    setIsSubmitting(true);
+    setStatus({});
 
-  try {
-    // ✅ Include rememberMe in the request payload
-    const response = await axiosInstance.post("/login", {
-      email: data.email,
-      password: data.password,
-      rememberMe: data.rememberMe, // let backend handle token validity
-    });
-
-    const { access_token: token, user } = response.data;
-
-    if (token && user) {
-      // ✅ Always store in localStorage now
-      localStorage.setItem("token", token);
-      localStorage.setItem("user", JSON.stringify(user));
-      localStorage.setItem("rememberMe", data.rememberMe ? "true" : "false");
-      localStorage.setItem("savedEmail", data.email);
-
-      axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-
-      reset();
-      onLoginSuccess(user, token);
-    } else {
-      setStatus({ type: "error", message: "Invalid server response." });
-    }
-
-  } catch (error) {
-    const res = error.response;
-
-    if (res?.status === 403 && res?.data?.error === "Email not verified.") {
-      setCurrentEmail(data.email);
-      setShowVerifyModal(true);
-      setStatus({ type: "error", message: "Please verify your email." });
-    } else if (res?.status === 401) {
-      setStatus({ type: "error", message: "Invalid email or password." });
-    } else {
-      setStatus({
-        type: "error",
-        message: res?.data?.error || "Login failed. Please try again.",
+    try {
+      const response = await axiosInstance.post("/login", {
+        email: data.email,
+        password: data.password,
+        rememberMe: data.rememberMe, // backend sets refresh token lifetime
       });
+
+      const { user } = response.data;
+
+      if (user) {
+        localStorage.setItem("user", JSON.stringify(user));
+        localStorage.setItem("rememberMe", data.rememberMe ? "true" : "false");
+        localStorage.setItem("savedEmail", data.email);
+
+        reset();
+        onLoginSuccess(user); // we don’t need the token anymore
+      } else {
+        setStatus({ type: "error", message: "Invalid server response." });
+      }
+    } catch (error) {
+      const res = error.response;
+      if (res?.status === 403 && res?.data?.error === "Email not verified.") {
+        setCurrentEmail(data.email);
+        setShowVerifyModal(true);
+        setStatus({ type: "error", message: "Please verify your email." });
+      } else if (res?.status === 401) {
+        setStatus({ type: "error", message: "Invalid email or password." });
+      } else {
+        setStatus({
+          type: "error",
+          message: res?.data?.error || "Login failed. Please try again.",
+        });
+      }
+    } finally {
+      setIsSubmitting(false);
     }
-  } finally {
-    setIsSubmitting(false);
-  }
-};
-
-
-
+  };
 
   const resendVerification = async () => {
     setResending(true);
     setEmailSent(false);
     setStatus({});
- 
+
     try {
       const res = await axiosInstance.post("/resend-verification", {
         email: currentEmail,

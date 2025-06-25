@@ -4,62 +4,40 @@ let navigateRef = null;
 
 const axiosInstance = axios.create({
   baseURL: process.env.REACT_APP_API_BASE_URL,
-  withCredentials: true,  // very important for refresh cookie
+  withCredentials: true,  // ⬅️ necessary to send cookies
 });
 
-
+// 🔁 Let AppRouter or auth handler set this
 export const setNavigate = (navigate) => {
   navigateRef = navigate;
 };
 
-// Request Interceptor
-axiosInstance.interceptors.request.use(
-  (config) => {
-    const accessToken = localStorage.getItem('token') || sessionStorage.getItem('token');
-    const skipAuth = config?.skipAuth === true;
+// ✅ REMOVE Request Interceptor (not needed with cookie-based auth)
+// Cookies are automatically included by browser, no headers needed
 
-    if (skipAuth) {
-      delete config.headers?.Authorization;
-    } else if (accessToken) {
-      config.headers = {
-        ...config.headers,
-        Authorization: `Bearer ${accessToken}`,
-      };
-    }
-
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
-
-// Response Interceptor (Handles 401)
+// ✅ Response Interceptor: refresh if 401
 axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
 
+    // Retry once on 401
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
       try {
-        const refreshRes = await axios.post(
-          `${process.env.REACT_APP_API_BASE_URL}/refresh`,
-          {},
-          { withCredentials: true }
-        );
+        // Call refresh endpoint (sends refresh token via cookie)
+        await axiosInstance.post('/refresh');
 
-        const newToken = refreshRes.data.access_token;
-
-        if (newToken) {
-          localStorage.setItem('token', newToken);
-          axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${newToken}`;
-          originalRequest.headers["Authorization"] = `Bearer ${newToken}`;
-          return axiosInstance(originalRequest); // retry original request
-        }
+        // Retry original request after refresh success
+        return axiosInstance(originalRequest);
       } catch (refreshError) {
         console.warn("Refresh failed during 401:", refreshError);
+
+        // Clear storage and redirect to login
         localStorage.clear();
         sessionStorage.clear();
+
         if (navigateRef) {
           navigateRef('/login');
         } else {
@@ -71,6 +49,5 @@ axiosInstance.interceptors.response.use(
     return Promise.reject(error);
   }
 );
-
 
 export default axiosInstance;

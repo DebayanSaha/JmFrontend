@@ -29,7 +29,6 @@ const AppRouter = () => {
     const initAuth = async () => {
       setNavigate(navigate);
 
-      const token = localStorage.getItem('token');
       const userData = localStorage.getItem('user');
       const rememberMe = localStorage.getItem('rememberMe') === 'true';
 
@@ -43,26 +42,19 @@ const AppRouter = () => {
         return 'expired';
       };
 
-      if (token && userData) {
+      if (userData) {
         const parsedUser = JSON.parse(userData);
         setUser(parsedUser);
         setLicenseStatus(evaluateLicense(parsedUser));
         localStorage.setItem('isAuthenticated', 'true');
       } else if (rememberMe) {
         try {
-          const res = await axiosInstance.post('/refresh', {}, { withCredentials: true });
-          const newToken = res.data.access_token;
-
-          if (newToken) {
-            localStorage.setItem('token', newToken);
-            axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
-
-            if (userData) {
-              const parsedUser = JSON.parse(userData);
-              setUser(parsedUser);
-              setLicenseStatus(evaluateLicense(parsedUser));
-              localStorage.setItem('isAuthenticated', 'true');
-            }
+          await axiosInstance.post('/refresh'); // sends cookie
+          const parsedUser = JSON.parse(localStorage.getItem('user'));
+          if (parsedUser) {
+            setUser(parsedUser);
+            setLicenseStatus(evaluateLicense(parsedUser));
+            localStorage.setItem('isAuthenticated', 'true');
           }
         } catch (err) {
           console.warn('Token refresh failed. Redirecting to login.');
@@ -82,16 +74,16 @@ const AppRouter = () => {
     initAuth();
   }, [navigate]);
 
+
   // ✅ 2. This one REMAINS AS IS
   useEffect(() => {
     if (!loading && window.location.pathname === '/') {
-      console.log('Redirecting from root to login...');
       navigate('/login', { replace: true });
     }
   }, [loading, navigate]);
 
 
-  const handleLoginSuccess = (userData, token) => {
+  const handleLoginSuccess = (userData) => {
     setUser(userData);
     localStorage.setItem('isAuthenticated', 'true');
 
@@ -106,8 +98,6 @@ const AppRouter = () => {
         : 'expired';
 
     setLicenseStatus(license);
-
-    // Update AuthContext immediately after login
     updateAuth();
 
     const publicPaths = ['/login', '/signup', '/forgot-password', '/verified-popup'];
@@ -116,13 +106,8 @@ const AppRouter = () => {
     navigate(redirectTo);
   };
 
+
   const isAuthenticated = !!user;
-
-  console.log('AppRouter render - isAuthenticated:', isAuthenticated, 'loading:', loading);
-
-  if (loading) {
-    return <div>Loading...</div>;
-  }
 
   return (
     <Routes>
