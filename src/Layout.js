@@ -97,6 +97,7 @@ function Layout({ licenseStatus, onLogout }) {
         )}
         {/* Main content: always flex: 1, min-width: 0 for perfect wrapping */}
         <div
+          className="route-transition"
           style={{
             flex: 1,
             minWidth: 0,
@@ -108,18 +109,21 @@ function Layout({ licenseStatus, onLogout }) {
             overflowX: 'hidden',
             paddingTop: '40px',
             background: 'linear-gradient(to bottom, #FFF8F1, #FFF1E6)',
-            transition: 'all 0.3s',
+            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
           }}
         >
-          <main style={{
-            flexGrow: 1,
-            width: '100%',
-            maxWidth: '100vw',
-            minHeight: 'calc(100vh - 80px)',
-            overflowX: 'hidden',
-            display: 'flex',
-            flexDirection: 'column',
-          }}>
+          <main 
+            className="page-loaded"
+            style={{
+              flexGrow: 1,
+              width: '100%',
+              maxWidth: '100vw',
+              minHeight: 'calc(100vh - 80px)',
+              overflowX: 'hidden',
+              display: 'flex',
+              flexDirection: 'column',
+            }}
+          >
             <Outlet />
           </main>
           <Footer />

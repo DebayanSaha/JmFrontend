@@ -351,6 +351,7 @@ function IntelligentTestAnalysis() {
         <Grid
           container
           spacing={2}
+          className="route-transition"
           style={{
             width: "100%",
             margin: 0,
@@ -359,7 +360,7 @@ function IntelligentTestAnalysis() {
             boxSizing: "border-box",
             borderRadius: "16px",
             padding: "-15px",
-            transition: "all 0.3s ease-in-out",
+            transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
             minWidth: 0,
             overflowX: 'auto',
           }}
@@ -376,10 +377,12 @@ function IntelligentTestAnalysis() {
               borderRadius: "16px",
               padding: "24px",
               boxShadow: "0 8px 24px rgba(255, 153, 102, 0.2)",
-              transition: "all 0.3s ease-in-out",
+              transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
               marginBottom: "24px",
               cursor: "default",
+              animation: "fadeInUp 0.5s ease-out",
             }}
+              className="card-transition"
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = "scale(1.015)";
                 e.currentTarget.style.boxShadow = "0 12px 32px rgba(255, 153, 102, 0.3)";
@@ -512,9 +515,11 @@ function IntelligentTestAnalysis() {
               borderRadius: "16px",
               padding: "24px",
               boxShadow: "0 8px 24px rgba(255, 153, 102, 0.2)",
-              transition: "all 0.3s ease-in-out",
+              transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
               cursor: "default",
+              animation: "fadeInUp 0.5s ease-out",
             }}
+              className="card-transition"
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = "scale(1.015)";
                 e.currentTarget.style.boxShadow = "0 12px 32px rgba(255, 153, 102, 0.3)";
@@ -628,9 +633,11 @@ function IntelligentTestAnalysis() {
               padding: "24px",
               minHeight: "500px",
               boxShadow: "0 8px 24px rgba(255, 153, 102, 0.2)",
-              transition: "all 0.3s ease-in-out",
+              transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
               cursor: "default",
+              animation: "fadeInUp 0.5s ease-out",
             }}
+              className="card-transition"
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = "scale(1.015)";
                 e.currentTarget.style.boxShadow = "0 12px 32px rgba(255, 153, 102, 0.3)";

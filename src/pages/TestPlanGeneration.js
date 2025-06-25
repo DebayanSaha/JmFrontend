@@ -155,9 +155,9 @@ const TestPlanGeneration = () => {
           <div className="tp-header-desc">Unlocking Insights, Enhancing Precision!</div>
         </div>
 
-        <div className="tp-panels">
+        <div className="tp-panels route-transition">
           {/* ✅ Swapped: Generator Panel First */}
-          <div className="tp-panel tp-panel-chat">
+          <div className="tp-panel tp-panel-chat card-transition">
             <div className="tp-panel-title flex items-center gap-2">
               <MessageSquare size={18} />
               JMeter Test Generator
@@ -218,7 +218,7 @@ const TestPlanGeneration = () => {
           </div>
 
           {/* ✅ History Panel Second (Right) */}
-          <div className="tp-panel tp-panel-history">
+          <div className="tp-panel tp-panel-history card-transition">
             <div className="tp-panel-title">History</div>
 
             <div className="tp-history-search">

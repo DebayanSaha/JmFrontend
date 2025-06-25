@@ -53,6 +53,8 @@ const RunTestPage = () => {
     const fetchJTLHistory = async () => {
       try {
         const res = await axiosInstance.get("/list-files?type=jtl");
+        console.log("JTL history:", res.data);
+
 
         const parsedHistory = (res.data || []).map(file => ({
           filename: file.filename,
@@ -422,7 +424,7 @@ const RunTestPage = () => {
           </div>
         </div>
 
-        <div className="tp-panels" style={{
+        <div className="tp-panels route-transition" style={{
           display: 'flex',
           gap: '24px',
           justifyContent: 'center',
@@ -434,14 +436,14 @@ const RunTestPage = () => {
         }}>
 
           {/* Test Runner Panel */}
-          <div className="tp-panel tp-panel-chat" style={{
+          <div className="tp-panel tp-panel-chat card-transition" style={{
             background: 'var(--tp-white)',
             borderRadius: 'var(--tp-radius)',
             padding: '24px',
             display: 'flex',
             flexDirection: 'column',
             animation: 'fadeIn 0.7s ease',
-            transition: 'all 0.3s ease',
+            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
             flex: '2 1 0',
             minWidth: '0',
             boxShadow: '0 8px 24px rgba(0,0,0,0.1)',
@@ -629,14 +631,14 @@ const RunTestPage = () => {
           </div>
 
           {/* History Panel */}
-          <div className="tp-panel tp-panel-history" style={{
+          <div className="tp-panel tp-panel-history card-transition" style={{
             background: 'var(--tp-white)',
             borderRadius: 'var(--tp-radius)',
             padding: '24px',
             display: 'flex',
             flexDirection: 'column',
             animation: 'fadeIn 0.7s ease',
-            transition: 'all 0.3s ease',
+            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
             minWidth: '280px',
             maxWidth: '340px',
             flex: '1 1 320px',

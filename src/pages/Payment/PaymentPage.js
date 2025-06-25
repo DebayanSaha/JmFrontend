@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axiosInstance from '../../api/axiosInstance';
 import { Zap, Check, Shield, Headphones, ArrowRight, CreditCard, DollarSign } from 'lucide-react';
-import Sidebar from '../../components/Sidebar';
-import Header from '../../components/Header';
 import useResponsive from '../../useResponsive';
 
 const currenciesWithRates = [
@@ -147,27 +145,16 @@ function PaymentPage() {
       overflow: 'hidden',
       fontFamily: "'Poppins', 'Inter', 'Segoe UI', Arial, sans-serif"
     }}>
-      {/* Sidebar Component */}
-      <Sidebar
-        isMobile={isMobile}
-        sidebarOpen={sidebarOpen}
-        setSidebarOpen={setSidebarOpen}
-        sidebarHovered={sidebarHovered}
-        setSidebarHovered={setSidebarHovered}
-      />
-
       {/* Main Content Wrapper */}
       <div style={{
         flex: 1,
-        marginLeft: isMobile ? 0 : "-20px",
+        marginLeft: 0,
         transition: 'margin-left 0.3s ease',
         display: 'flex',
         flexDirection: 'column',
         minHeight: '100vh',
         position: 'relative'
       }}>
-      
-
         {/* Content Container */}
         <main className="payment-main-content">
           {/* Header Section with enhanced animations */}
@@ -684,24 +671,6 @@ function PaymentPage() {
           </div>
         </main>
       </div>
-
-      {/* Mobile overlay for sidebar */}
-      {isMobile && sidebarOpen && (
-        <div
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: 'rgba(0, 0, 0, 0.5)',
-            zIndex: 1198,
-            transition: 'opacity 0.3s ease'
-          }}
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
-
       <style jsx global>{`
         body {
           background: linear-gradient(to bottom, #FFF8F1, #FFF1E6) !important;

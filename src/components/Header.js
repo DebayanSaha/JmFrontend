@@ -67,7 +67,7 @@ const Header = ({ licenseStatus, isMobile, sidebarOpen, setSidebarOpen, dropdown
 
   return (
     <div
-      className="page-navbar"
+      className="page-navbar header-transition"
       style={{
         display: "flex",
         flexWrap: 'wrap',
@@ -90,6 +90,7 @@ const Header = ({ licenseStatus, isMobile, sidebarOpen, setSidebarOpen, dropdown
         minWidth: 0,
         maxWidth: '100vw',
         overflowX: 'hidden',
+        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
       }}
     >
       {isMobile && (
@@ -334,6 +335,7 @@ export const SettingsDropdown = ({ open, onClose, navigate, license, handleLogou
   
   return (
     <div
+      className="modal-transition"
       style={{
         position: "fixed",
         top: 70, // below header
@@ -349,6 +351,7 @@ export const SettingsDropdown = ({ open, onClose, navigate, license, handleLogou
         maxWidth: "98vw",
         wordBreak: "break-word",
         right: 0,
+        animation: "fadeInUp 0.3s ease-out",
       }}
     >
       <div style={{ display: "flex", flexDirection: "column", gap: "clamp(8px, 2vw, 12px)" }}>

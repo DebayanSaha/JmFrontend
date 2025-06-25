@@ -88,6 +88,7 @@ const Dashboard = () => {
   return (
     <>
       <div
+        className="route-transition"
         style={{
           display: 'flex',
           flexDirection: 'column',
@@ -181,9 +182,10 @@ const Dashboard = () => {
             alignItems: 'stretch',
           }}
         >
-          {cards.map((card, index) => (
+          {cards.map((card) => (
             <Card
               key={card.id}
+              className="card-transition"
               sx={{
                 background: 'linear-gradient(135deg, #fff 0%, #fff 100%)',
                 backdropFilter: 'blur(80px)',
@@ -193,15 +195,16 @@ const Dashboard = () => {
                 width: '90%',
                 height: 'clamp(180px, 28vw, 240px)',
                 boxShadow: '0 4px 12px rgba(255, 153, 102, 0.1)',
-                transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                 cursor: 'pointer',
                 overflow: 'hidden',
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'space-between',
+                animation: 'fadeIn 0.7s ease',
                 '&:hover': {
-                  transform: 'scale(1.015)',
-                  boxShadow: '0 8px 24px rgba(255, 153, 102, 0.2)',
+                  transform: 'scale(1.02) translateY(-4px)',
+                  boxShadow: '0 12px 32px rgba(255, 153, 102, 0.25)',
                 },
               }}
             >
@@ -312,14 +315,12 @@ const Dashboard = () => {
       </div>
 
       <style>{`
-        @keyframes fadeInUp {
+        @keyframes fadeIn {
           0% {
             opacity: 0;
-            transform: translateY(40px);
           }
           100% {
             opacity: 1;
-            transform: translateY(0);
           }
         }
         @media (max-width: 1024px) {
