@@ -89,8 +89,16 @@ const AppRouter = () => {
 
 
   const handleLoginSuccess = (userData) => {
-    setUser(userData);
+    const rememberMe = localStorage.getItem('rememberMe') === 'true';
+
+    if (rememberMe) {
+      localStorage.setItem('user', JSON.stringify(userData));
+    } else {
+      sessionStorage.setItem('user', JSON.stringify(userData));
+    }
+
     localStorage.setItem('isAuthenticated', 'true');
+    setUser(userData);
 
     const now = new Date();
     const trialEnd = userData.trial_ends_at ? new Date(userData.trial_ends_at) : null;
@@ -110,6 +118,7 @@ const AppRouter = () => {
 
     navigate(redirectTo);
   };
+
 
 
   const isAuthenticated = !!user;
