@@ -58,8 +58,8 @@ const handleLogout = () => {
   } catch (err) {
     console.warn("Logout error:", err);
   } finally {
-    // Redirect to login
-    window.location.href = "/login";
+    // Redirect to login using navigate for SPA
+    navigate("/login");
   }
 };
 
