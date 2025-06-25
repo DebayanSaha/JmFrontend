@@ -509,12 +509,11 @@ function IntelligentTestAnalysis() {
 
             {/* History Panel */}
             <div style={{
-              background: "white",
-              backdropFilter: "blur(80px)",
-              border: "1px solid rgba(255, 126, 95, 0.2)",
+              background: "#fff",
+              border: "1px solid #E0E0E0",
               borderRadius: "16px",
               padding: "24px",
-              boxShadow: "0 8px 24px rgba(255, 153, 102, 0.2)",
+              boxShadow: "0 8px 24px rgba(255, 153, 102, 0.08)",
               transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
               cursor: "default",
               animation: "fadeInUp 0.5s ease-out",
@@ -522,11 +521,11 @@ function IntelligentTestAnalysis() {
               className="card-transition"
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = "scale(1.015)";
-                e.currentTarget.style.boxShadow = "0 12px 32px rgba(255, 153, 102, 0.3)";
+                e.currentTarget.style.boxShadow = "0 12px 32px rgba(255, 153, 102, 0.13)";
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = "scale(1)";
-                e.currentTarget.style.boxShadow = "0 8px 24px rgba(255, 153, 102, 0.2)";
+                e.currentTarget.style.boxShadow = "0 8px 24px rgba(255, 153, 102, 0.08)";
               }}>
               <Typography variant="h6" style={{
                 fontSize: "20px",
@@ -563,43 +562,52 @@ function IntelligentTestAnalysis() {
                     }}
               />
 
-
-
-
-
+              {/* Add gap below search bar */}
+              <div style={{ height: '18px' }} />
 
               {/* History List */}
-              <div style={{
-                maxHeight: "300px",
-                overflowY: "auto",
-                overflowX: "hidden"
+              <div className="tp-history-list" style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '16px',
+                overflowY: 'auto',
+                overflowX: 'hidden',
+                maxHeight: '128px', // 2 cards * (56px + 16px gap) = 128px (assuming each card is ~56px tall)
+                boxShadow: '0 2px 8px 0 rgba(255, 122, 0, 0.04)',
+                position: 'relative',
               }}>
                 {filteredHistory.length > 0 ? (
                   filteredHistory.map((item, idx) => (
                     <div
+                      className="tp-history-card"
                       key={idx}
                       style={{
-                        padding: "16px",
-                        marginBottom: "8px",
-                        background: "#F5F5F5",
-                        borderRadius: "8px",
-                        cursor: "pointer",
-                        transition: "all 0.3s ease",
+                        background: '#F5F5F5',
+                        borderRadius: '12px',
+                        padding: '16px 18px',
+                        border: '1px solid #E0E0E0',
+                        transition: 'box-shadow 0.2s, transform 0.2s',
+                        cursor: 'pointer',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'space-between',
                         gap: '8px',
+                        position: 'relative',
                         wordBreak: 'break-all',
                         overflowWrap: 'anywhere',
                       }}
+                      onMouseEnter={e => {
+                        e.currentTarget.style.boxShadow = '0 12px 32px rgba(255, 153, 102, 0.13)';
+                        e.currentTarget.style.transform = 'scale(1.01)';
+                      }}
+                      onMouseLeave={e => {
+                        e.currentTarget.style.boxShadow = 'none';
+                        e.currentTarget.style.transform = 'scale(1)';
+                      }}
                     >
                       <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
-                        <Typography variant="body2" style={{ color: "#333333", fontWeight: "600", marginBottom: "4px" }}>
-                          {item.filename}
-                        </Typography>
-                        <Typography variant="caption" style={{ color: "#666666" }}>
-                          Analyzed: {item.date}
-                        </Typography>
+                        <span style={{ color: '#333333', fontWeight: 600, marginBottom: 4, fontSize: 15 }}>{item.filename}</span>
+                        <span style={{ color: '#666666', fontSize: 13 }}>Analyzed: {item.date}</span>
                       </div>
                       <FaDownload
                         style={{ fontSize: 18, color: '#FF6D00', cursor: 'pointer', marginLeft: 8, transition: 'color 0.2s' }}

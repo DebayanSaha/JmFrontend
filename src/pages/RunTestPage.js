@@ -701,7 +701,7 @@ const RunTestPage = () => {
                     borderRadius: '12px',
                     padding: '16px 18px',
                     border: '1px solid var(--tp-border)',
-                    transition: 'all 0.2s ease',
+                    transition: 'box-shadow 0.2s, transform 0.2s',
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
@@ -710,7 +710,16 @@ const RunTestPage = () => {
                     position: 'relative',
                     wordBreak: 'break-all',
                     overflowWrap: 'anywhere',
-                  }}>
+                  }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.boxShadow = '0 12px 32px rgba(255, 153, 102, 0.13)';
+                    e.currentTarget.style.transform = 'scale(1.01)';
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.boxShadow = 'none';
+                    e.currentTarget.style.transform = 'scale(1)';
+                  }}
+                  >
                     <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
                       <div className="tp-history-filename" style={{ fontWeight: '600', fontSize: '15px', marginBottom: '4px', color: 'var(--tp-text)', display: 'flex', alignItems: 'center', gap: '6px' }}>
                         {item.filename}
