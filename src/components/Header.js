@@ -42,26 +42,26 @@ const Header = ({ licenseStatus, isMobile, sidebarOpen, setSidebarOpen, dropdown
     }
   }, []);
 
-const handleLogout = () => {
-  try {
-    // Clear both localStorage and sessionStorage
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    localStorage.removeItem("rememberMe");
-    localStorage.removeItem("savedEmail");
-
-    sessionStorage.removeItem("token");
-    sessionStorage.removeItem("user");
-
-    // Remove Authorization header globally
-    delete axiosInstance.defaults.headers.common["Authorization"];
-  } catch (err) {
-    console.warn("Logout error:", err);
-  } finally {
-    if (onLogout) onLogout();
-    else navigate("/login");
-  }
-};
+  const handleLogout = async () => {
+    try {
+      await axiosInstance.post("/logout");
+    } catch (err) {
+      console.warn("Logout error:", err);
+    } finally {
+      // Fully clean both storages
+      localStorage.clear();
+      sessionStorage.clear();
+ 
+      // Set rememberMe explicitly false
+      localStorage.setItem("rememberMe", "false");
+ 
+      delete axiosInstance.defaults.headers.common["Authorization"];
+ 
+      // Redirect to login
+      window.location.href = "/login";
+    }
+  };
+ 
 
   const handleUpgrade = () => {
     setDropdownOpen(false);
