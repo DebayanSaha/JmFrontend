@@ -110,7 +110,7 @@ function IntelligentTestAnalysis() {
         const mdRes = await axiosInstance.get("/list-files?type=md");
         const mdHistory = (mdRes.data || []).map(f => ({
           filename: f.filename,
-          date: formatDateSafe(f.last_modified),
+          date: formatDateSafe(f.datetime),
         }));
         setHistory(mdHistory);
       } catch (err) {

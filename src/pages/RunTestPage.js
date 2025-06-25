@@ -53,12 +53,10 @@ const RunTestPage = () => {
     const fetchJTLHistory = async () => {
       try {
         const res = await axiosInstance.get("/list-files?type=jtl");
-        console.log("JTL history:", res.data);
-
 
         const parsedHistory = (res.data || []).map(file => ({
           filename: file.filename,
-          date: formatDateSafe(file.last_modified),
+          date: formatDateSafe(file.datetime),
         }));
         setHistory(parsedHistory);
 

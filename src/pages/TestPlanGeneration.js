@@ -124,7 +124,7 @@ const TestPlanGeneration = () => {
 
       const parsedHistory = (res.data || []).map(file => ({
         filename: file.filename,
-        date: formatDateSafe(file.last_modified),
+        date: formatDateSafe(file.datetime),
         testType: inferTestType(file.filename),
       }));
       setHistory(parsedHistory);

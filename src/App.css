@@ -56,7 +56,9 @@
 }
 
 /* Base Styles */
-body {
+html, body {
+  overflow-x: hidden !important;
+  width: 100% !important;
   font-family: var(--font-family);
   /* background: var(--background); */ /* Removed global background */
   color: var(--text-primary);
@@ -335,7 +337,7 @@ button:disabled {
   background: none;
   border: none;
   cursor: pointer;
-  transition: color 0.2s ease, text-shadow 0.2s;
+  transition: color 0.2s ease, text-shadow 0.2s ease;
 }
 
 .forgot-password:hover,
@@ -1020,7 +1022,7 @@ button:disabled {
   color: #00c6ff;
   text-decoration: none;
   font-size: 1.2rem;
-  transition: color 0.2s, text-shadow 0.2s;
+  transition: color 0.2s ease, text-shadow 0.2s ease;
   border: none;
   cursor: pointer;
   background: none;
@@ -1593,6 +1595,32 @@ input:-webkit-autofill:hover {
     font-size: clamp(0.75rem, 2vw, 0.85rem) !important;
     text-align: center !important;
   }
+}
+
+/* Professional vertical scrollbar for all pages */
+html, body, * {
+  scrollbar-width: thin;
+  scrollbar-color: #bdbdbd #fff4f462;
+}
+
+/* Chrome, Edge, Safari */
+::-webkit-scrollbar {
+  width: 10px;
+  background: #181a1b;
+}
+::-webkit-scrollbar-thumb {
+  background: #bdbdbd;
+  border-radius: 8px;
+  min-height: 40px;
+  border: 2px solid #181a1b;
+  transition: background 0.2s;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #a0a0a0;
+}
+::-webkit-scrollbar-track {
+  background: #181a1b;
+  border-radius: 8px;
 }
 
 .forgot-password:focus-visible,
