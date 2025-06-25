@@ -4,7 +4,7 @@ import { FaUser, FaPowerOff, FaClock, FaCog, FaSignOutAlt } from "react-icons/fa
 import axiosInstance from "../api/axiosInstance";
 import { useAuthContext } from '../context/AuthContext';
 
-const Header = ({ licenseStatus, isMobile, sidebarOpen, setSidebarOpen, dropdownOpen, setDropdownOpen }) => {
+const Header = ({ licenseStatus, isMobile, sidebarOpen, setSidebarOpen, dropdownOpen, setDropdownOpen, onLogout }) => {
   const navigate = useNavigate();
   const [license, setLicense] = useState("Loading...");
   const [isExpiringSoon, setIsExpiringSoon] = useState(false);
@@ -58,8 +58,8 @@ const handleLogout = () => {
   } catch (err) {
     console.warn("Logout error:", err);
   } finally {
-    // Redirect to login using navigate for SPA
-    navigate("/login");
+    if (onLogout) onLogout();
+    else navigate("/login");
   }
 };
 

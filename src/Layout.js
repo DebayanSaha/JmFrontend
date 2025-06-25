@@ -6,7 +6,7 @@ import { Outlet, useNavigate } from "react-router-dom";
 import { useResponsive } from './useResponsive';
 import ReactDOM from 'react-dom';
 
-function Layout({ licenseStatus }) {
+function Layout({ licenseStatus, onLogout }) {
   const { isSm, isXs } = useResponsive();
   const isMobile = isXs || isSm;
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -41,6 +41,7 @@ function Layout({ licenseStatus }) {
         setSidebarOpen={setSidebarOpen}
         dropdownOpen={dropdownOpen}
         setDropdownOpen={setDropdownOpen}
+        onLogout={onLogout}
       />
       {/* Settings Dropdown rendered at the end of the DOM tree for priority */}
       {ReactDOM.createPortal(
@@ -48,10 +49,10 @@ function Layout({ licenseStatus }) {
           open={dropdownOpen} 
           onClose={() => setDropdownOpen(false)}
           navigate={navigate}
-          license={license}
+          license={undefined}
           isAuthenticated={true}
-          handleLogout={handleLogout}
-          handleUpgrade={handleUpgrade}
+          handleLogout={onLogout}
+          handleUpgrade={() => navigate('/payment')}
         />,
         document.body
       )}

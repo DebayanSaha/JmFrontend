@@ -29,6 +29,15 @@ const AppRouter = () => {
     navigate('/dashboard');
   };
 
+  // New: handle logout to clear user and redirect
+  const handleLogout = () => {
+    setUser(null);
+    localStorage.removeItem('user');
+    sessionStorage.removeItem('user');
+    updateAuth();
+    navigate('/login');
+  };
+
   // If not logged in, only allow login, signup, forgot-password, verified-popup
   if (!user) {
     return (
@@ -46,7 +55,7 @@ const AppRouter = () => {
   // If logged in, show the full app
   return (
     <Routes>
-      <Route element={<Layout licenseStatus={null} />}>
+      <Route element={<Layout licenseStatus={null} onLogout={handleLogout} />}>
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/intelligent-test-analysis" element={<IntelligentTestAnalysis />} />
         <Route path="/test-plan-generation" element={<TestPlanGeneration />} />
