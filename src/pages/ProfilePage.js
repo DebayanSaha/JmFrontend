@@ -154,10 +154,27 @@ const ProfilePage = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [editingPhone, user]);
   return (
-    <div style={{ minHeight: '100vh', background: 'linear-gradient(to bottom, #FFF8F1, #FFF1E6)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 54 }}>
-      <div ref={cardRef} style={{ width: '100%', maxWidth: 480, background: 'rgba(255,255,255,0.98)', borderRadius: 24, boxShadow: '0 12px 36px rgba(255,109,0,0.13)', padding: '48px 32px 36px 32px', display: 'flex', flexDirection: 'column', gap: 28 }}>
-        <h2 style={{ color: '#FF6D00', fontWeight: 800, fontSize: 28, textAlign: 'center' }}><User size={24} style={{ marginRight: 8, verticalAlign: 'middle' }} />Profile</h2>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 22 }}>
+    <div style={{ minHeight: '100vh', background: 'linear-gradient(to bottom, #FFF8F1, #FFF1E6)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 32 }}>
+      <div ref={cardRef} style={{ width: '100%', maxWidth: 600, margin: 'auto', background: 'rgba(255,255,255,0.98)', borderRadius: 16, boxShadow: '0 8px 24px rgba(0,0,0,0.08)', padding: '40px 24px 32px 24px', display: 'flex', flexDirection: 'column', gap: 0 }}>
+        <h2 style={{ color: '#FF6D00', fontWeight: 800, fontSize: 28, textAlign: 'center', marginBottom: 24, letterSpacing: 0.5 }}>
+          <span style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: 40,
+            height: 40,
+            borderRadius: '50%',
+            background: 'rgba(255,102,0,0.1)',
+            marginRight: 10,
+            verticalAlign: 'middle',
+          }}>
+            <User size={20} style={{ color: '#FF6D00', verticalAlign: 'middle' }} />
+          </span>
+          Profile
+        </h2>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          {/* Personal Info Section */}
+          <SectionTitle>Personal Info</SectionTitle>
           <InfoRow icon={<User />} label="Name" value={user.name} />
           <InfoRow icon={<Mail />} label="Email" value={user.email} />
           <InfoRow
@@ -171,18 +188,54 @@ const ProfilePage = () => {
             onSave={handlePhoneSave}
             onChange={setPhone}
           />
-
-
           {phoneStatus && <StatusMessage status={phoneStatus} />}
           <InfoRow icon={<Globe />} label="Country" value={user.country} />
           <InfoRow icon={<Building />} label="Organization" value={user.organization} />
-          <InfoRow icon={<CreditCard />} label="Card" value={cardDetails.verified ? `${cardDetails.network} •••• ${cardDetails.last4}` : 'Not Verified'} buttonText="Verify Card" onButtonClick={handleAddCard} />
+          <Divider />
+          {/* Card Status Section */}
+          <SectionTitle>Card Status</SectionTitle>
+          <CardStatusRow
+            icon={<CreditCard />}
+            verified={cardDetails.verified}
+            network={cardDetails.network}
+            last4={cardDetails.last4}
+            cardStatus={cardStatus}
+            onButtonClick={handleAddCard}
+          />
           {cardStatus && <StatusMessage status={cardStatus} />}
+          <Divider />
+          {/* License Info Section */}
+          <SectionTitle>License Info</SectionTitle>
           <InfoRow icon={<BadgeCheck />} label="License" value={user.license} />
           <InfoRow icon={<Clock />} label="Trial Ends" value={new Date(user.trial_ends_at).toLocaleDateString()} />
           <InfoRow icon={<CalendarCheck />} label="Paid Ends" value={new Date(user.paid_ends_at).toLocaleDateString()} />
         </div>
-
+        <button
+          onClick={() => setShowDeleteConfirm(true)}
+          style={{
+            background: '#ff6d00',
+            color: '#fff',
+            border: 'none',
+            borderRadius: 8,
+            padding: '8px 16px',
+            fontWeight: 700,
+            fontSize: 15,
+            marginTop: 32,
+            cursor: 'pointer',
+            transition: 'background 0.2s, box-shadow 0.2s, transform 0.2s',
+            boxShadow: '0 2px 8px rgba(255,109,0,0.08)',
+          }}
+          onMouseEnter={e => {
+            e.currentTarget.style.background = '#e65c00';
+            e.currentTarget.style.transform = 'translateY(-2px)';
+          }}
+          onMouseLeave={e => {
+            e.currentTarget.style.background = '#ff6d00';
+            e.currentTarget.style.transform = 'none';
+          }}
+        >
+          Delete My Account
+        </button>
         {/* Delete Confirmation Modal */}
         {showDeleteConfirm && (
           <div
@@ -241,72 +294,187 @@ const ProfilePage = () => {
             </div>
           </div>
         )}
-
-
-
-        <button onClick={() => setShowDeleteConfirm(true)} style={{ background: '#EF4444', color: '#fff', border: 'none', borderRadius: 6, padding: '8px 16px', fontWeight: 600, cursor: 'pointer' }}>Delete My Account</button>
       </div>
+      <style>{`
+        @media (max-width: 700px) {
+          .profile-card { padding: 18px 4vw 18px 4vw !important; }
+        }
+        @media (max-width: 480px) {
+          .profile-card { padding: 8px 2vw 8px 2vw !important; }
+        }
+      `}</style>
     </div>
   );
 };
 
+const SectionTitle = ({ children }) => (
+  <div style={{ fontSize: 15, fontWeight: 700, color: '#FF6D00', margin: '18px 0 2px 0', letterSpacing: 0.2 }}>{children}</div>
+);
+
+const Divider = () => (
+  <div style={{ width: '100%', height: 1, background: '#f3f3f3', margin: '18px 0' }} />
+);
+
 const InfoRow = ({ icon, label, value, originalValue,
   editable, editing, setEditing,
   onSave, onChange, buttonText, onButtonClick }) => (
-  <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-    {icon && React.cloneElement(icon, { style: { color: '#FF6D00', verticalAlign: 'middle' } })}
-    <span style={{ color: '#888', fontWeight: 600, minWidth: 70 }}>{label}:</span>
-    {editable ? (
-      editing ? (
-        <>
-          <input
-            type="text"
-            value={value}
-            onChange={e => onChange(e.target.value)}
-            onBlur={() => {
-              setEditing(false);
-              onChange(originalValue); // revert to original value if clicking outside
-            }}
-            onKeyDown={e => {
-              if (e.key === 'Enter') onSave();
-            }}
-            style={{
-              fontFamily: 'inherit',
-              fontSize: 15,
-              border: '1.5px solid #E0E0E0',
-              borderRadius: 8,
-              padding: '6px 12px',
-              background: '#FFF8F1',
-              color: '#222',
-              minWidth: 120
-            }}
-            autoFocus
-          />
+  <div style={{
+    display: 'flex',
+    alignItems: 'center',
+    gap: 0,
+    justifyContent: 'space-between',
+    width: '100%',
+    minHeight: 38,
+    margin: '0.5rem 0',
+  }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+      <span style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: 32,
+        height: 32,
+        borderRadius: '50%',
+        background: 'rgba(255,102,0,0.1)',
+        marginRight: 8,
+        verticalAlign: 'middle',
+      }}>{React.cloneElement(icon, { size: 16, style: { color: '#FF6D00', verticalAlign: 'middle' } })}</span>
+      <span style={{ color: '#888', fontWeight: 500, fontSize: 14, minWidth: 70 }}>{label}:</span>
+    </div>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0, flex: 1, justifyContent: 'flex-end' }}>
+      {editable ? (
+        editing ? (
+          <>
+            <input
+              type="text"
+              value={value}
+              onChange={e => onChange(e.target.value)}
+              style={{
+                fontFamily: 'inherit',
+                fontSize: 15,
+                border: '1.5px solid #E0E0E0',
+                borderRadius: 8,
+                padding: '6px 12px',
+                background: '#FFF8F1',
+                color: '#222',
+                minWidth: 120,
+                marginRight: 6,
+              }}
+              autoFocus
+            />
+            <span
+              onMouseDown={e => { e.preventDefault(); onSave(); }}
+              style={{ color: '#ff6d00', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', transition: 'transform 0.15s, color 0.15s' }}
+              onMouseEnter={e => { e.currentTarget.style.color = '#e65c00'; e.currentTarget.style.transform = 'scale(1.1)'; }}
+              onMouseLeave={e => { e.currentTarget.style.color = '#ff6d00'; e.currentTarget.style.transform = 'none'; }}
+            >
+              <CheckCircle2 size={18} />
+            </span>
+          </>
+        ) : (
+          <>
+            <span style={{ color: '#222', fontWeight: 600, fontSize: 15, textAlign: 'right', minWidth: 80 }}>{value || '-'}</span>
+            <span
+              onClick={() => setEditing(true)}
+              style={{ color: '#ff6d00', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', marginLeft: 6, transition: 'transform 0.15s, color 0.15s' }}
+              onMouseEnter={e => { e.currentTarget.style.color = '#e65c00'; e.currentTarget.style.transform = 'scale(1.1)'; }}
+              onMouseLeave={e => { e.currentTarget.style.color = '#ff6d00'; e.currentTarget.style.transform = 'none'; }}
+            >
+              <Edit2 size={16} />
+            </span>
+          </>
+        )
+      ) : buttonText && onButtonClick ? null : (
+        <span style={{ color: '#222', fontWeight: 600, fontSize: 15, textAlign: 'right', minWidth: 80 }}>{label === 'Password' ? 'kk********l' : value || '-'}</span>
+      )}
+      {buttonText && onButtonClick && (
+        <button
+          onClick={onButtonClick}
+          style={{
+            background: '#ff6d00',
+            color: '#fff',
+            borderRadius: 8,
+            border: 'none',
+            padding: '8px 16px',
+            fontWeight: 700,
+            fontSize: 14,
+            marginLeft: 8,
+            cursor: 'pointer',
+            transition: 'background 0.2s, box-shadow 0.2s, transform 0.2s',
+            boxShadow: '0 2px 8px rgba(255,109,0,0.08)',
+          }}
+          onMouseEnter={e => {
+            e.currentTarget.style.background = '#e65c00';
+            e.currentTarget.style.transform = 'translateY(-2px)';
+          }}
+          onMouseLeave={e => {
+            e.currentTarget.style.background = '#ff6d00';
+            e.currentTarget.style.transform = 'none';
+          }}
+        >
+          {buttonText}
+        </button>
+      )}
+    </div>
+  </div>
+);
 
-          <span onMouseDown={e => { e.preventDefault(); onSave(); }} style={{ color: '#FF6D00', cursor: 'pointer' }}>
-            <CheckCircle2 size={18} />
-          </span>
-        </>
+const CardStatusRow = ({ icon, verified, network, last4, cardStatus, onButtonClick }) => (
+  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', minHeight: 38, margin: '0.5rem 0' }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+      <span style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: 32,
+        height: 32,
+        borderRadius: '50%',
+        background: 'rgba(255,102,0,0.1)',
+        marginRight: 8,
+        verticalAlign: 'middle',
+      }}>{React.cloneElement(icon, { size: 16, style: { color: '#FF6D00', verticalAlign: 'middle' } })}</span>
+      <span style={{ color: '#888', fontWeight: 500, fontSize: 14, minWidth: 70 }}>Card:</span>
+    </div>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0, flex: 1, justifyContent: 'flex-end' }}>
+      {verified ? (
+        <span style={{ color: '#222', fontWeight: 600, fontSize: 15, textAlign: 'right', minWidth: 80 }}>{network} •••• {last4}</span>
       ) : (
         <>
-          <span style={{ color: '#222', fontWeight: 700 }}>{value || '-'}</span>
-          <span onClick={() => setEditing(true)} style={{ color: '#FF6D00', cursor: 'pointer' }}><Edit2 size={18} /></span>
+          <span style={{ color: '#888', fontWeight: 600, fontSize: 15, textAlign: 'right', minWidth: 80 }}>Not Verified</span>
+          <button
+            onClick={onButtonClick}
+            style={{
+              background: '#ff6d00',
+              color: '#fff',
+              borderRadius: 8,
+              border: 'none',
+              padding: '8px 16px',
+              fontWeight: 700,
+              fontSize: 14,
+              marginLeft: 8,
+              cursor: 'pointer',
+              transition: 'background 0.2s, box-shadow 0.2s, transform 0.2s',
+              boxShadow: '0 2px 8px rgba(255,109,0,0.08)',
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.background = '#e65c00';
+              e.currentTarget.style.transform = 'translateY(-2px)';
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.background = '#ff6d00';
+              e.currentTarget.style.transform = 'none';
+            }}
+          >
+            Verify Card
+          </button>
         </>
-      )
-    ) : buttonText && onButtonClick ? (
-      <>
-        <span style={{ color: '#222', fontWeight: 700 }}>{value || '-'}</span>
-        <button onClick={onButtonClick} style={{ marginLeft: 8, background: '#FF6D00', color: '#fff', borderRadius: 6, border: 'none', padding: '4px 10px', fontSize: 14, cursor: 'pointer' }}>{buttonText}</button>
-      </>
-    ) : (
-      <span style={{ color: '#222', fontWeight: 700 }}>{value || '-'}</span>
-    )}
-
+      )}
+    </div>
   </div>
 );
 
 const StatusMessage = ({ status }) => (
-  <div style={{ color: status.type === 'success' ? '#10B981' : '#EF4444', fontWeight: 500, marginTop: 2, display: 'flex', alignItems: 'center', gap: 6 }}>
+  <div style={{ color: status.type === 'success' ? '#10B981' : '#EF4444', fontWeight: 500, marginTop: 2, display: 'flex', alignItems: 'center', gap: 6, fontStyle: status.type === 'error' ? 'italic' : 'normal', fontSize: 13 }}>
     {status.type === 'success' ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />} {status.message}
   </div>
 );

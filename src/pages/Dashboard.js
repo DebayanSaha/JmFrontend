@@ -47,27 +47,27 @@ const Dashboard = () => {
       };
 
       const newCards = [
-    {
-      id: 1,
-      title: "Total Test Plans Generated",
+        {
+          id: 1,
+          title: "Total Test Plans Generated",
           value: data.total_test_plans_generated || 0,
           info: makeInfoText(data.total_test_plans_pct_change),
-      icon: <AssignmentTurnedIn fontSize="large" />,
-    },
-    {
-      id: 2,
-      title: "Total Tests Run",
+          icon: <AssignmentTurnedIn fontSize="large" />,
+        },
+        {
+          id: 2,
+          title: "Total Tests Run",
           value: data.total_tests_run || 0,
           info: makeInfoText(data.total_tests_run_pct_change),
-      icon: <PlayCircle fontSize="large" />,
-    },
-    {
-      id: 3,
-      title: "Intelligent Analysis Reports",
+          icon: <PlayCircle fontSize="large" />,
+        },
+        {
+          id: 3,
+          title: "Intelligent Analysis Reports",
           value: data.total_analysis_reports || 0,
           info: makeInfoText(data.total_analysis_reports_pct_change),
-      icon: <Assessment fontSize="large" />,
-    },
+          icon: <Assessment fontSize="large" />,
+        },
       ];
 
       setCards(newCards);
@@ -90,37 +90,37 @@ const Dashboard = () => {
       <main
         style={{
           flexGrow: 1,
-          padding: 'clamp(12px, 4vw, 32px) clamp(6px, 3vw, 24px) clamp(24px, 4vw, 40px) clamp(6px, 3vw, 24px)',
-          marginLeft: 0,
-          marginTop: 0,
-          width: '100%',
-          minHeight: 'calc(100vh - 80px)',
-          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-          boxSizing: 'border-box',
-          position: 'relative',
+          padding: "20px",
+          marginLeft: "0",
+          marginTop: "0",
+          width: `calc(100vw - ${sidebarWidth}px)`,
+          minHeight: "calc(100vh - 80px)",
+          transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+          boxSizing: "border-box",
+          position: "relative",
           zIndex: 1,
-          background: 'linear-gradient(to bottom, #FFF8F1, #FFF1E6)',
+          background: "linear-gradient(to bottom, #FFF8F1, #FFF1E6)",
           fontFamily: "'Poppins', sans-serif",
         }}
       >
         <div
           style={{
-            marginBottom: 'clamp(8px, 2vw, 24px)',
-            padding: 'clamp(18px, 5vw, 40px) clamp(8px, 4vw, 32px) clamp(12px, 3vw, 32px) clamp(8px, 4vw, 32px)',
-            width: '100%',
-            boxSizing: 'border-box',
-            position: 'relative',
+            marginBottom: "20px",
+            padding: "24px",
+            width: "100%",
+            boxSizing: "border-box",
+            position: "relative",
           }}
         >
           <svg
             style={{
-              position: 'absolute',
-              top: 'clamp(-18px, -4vw, -8px)',
-              left: 'clamp(-18px, -4vw, -8px)',
-              width: 'clamp(140px, 60vw, 320px)',
-              height: 'clamp(70px, 30vw, 160px)',
+              position: "absolute",
+              top: "-40px",
+              left: "-60px",
+              width: "320px",
+              height: "160px",
               zIndex: 0,
-              pointerEvents: 'none',
+              pointerEvents: "none",
             }}
             viewBox="0 0 320 160"
             fill="none"
@@ -139,15 +139,13 @@ const Dashboard = () => {
           <Typography
             variant="h3"
             style={{
-              color: '#FF6D00',
-              fontWeight: 900,
-              marginBottom: 'clamp(4px, 1vw, 12px)',
-              fontSize: 'clamp(1.3rem, 7vw, 2.2rem)',
-              letterSpacing: '0.5px',
-              position: 'relative',
+              color: "#FF6D00",
+              fontWeight: "900",
+              marginBottom: "12px",
+              fontSize: "34px",
+              letterSpacing: "0.5px",
+              position: "relative",
               zIndex: 1,
-              whiteSpace: 'normal',
-              overflowWrap: 'break-word',
             }}
           >
             Dashboard
@@ -155,48 +153,61 @@ const Dashboard = () => {
           <Typography
             variant="h6"
             style={{
-              color: '#333333',
-              fontWeight: 550,
-              fontSize: 'clamp(0.95rem, 3vw, 1.2rem)',
-              fontStyle: 'bold',
-              letterSpacing: '0.3px',
-              opacity: 0.85,
-              position: 'relative',
+              color: "#333333",
+              fontWeight: "550",
+              fontSize: "16px",
+              fontStyle: "bold",
+              letterSpacing: "0.3px",
+              opacity: "0.85",
+              position: "relative",
               zIndex: 1,
-              whiteSpace: 'normal',
-              overflowWrap: 'break-word',
             }}
           >
             Welcome to Dynamic Admin
           </Typography>
         </div>
 
-        <Grid container spacing={2} sx={{ maxWidth: '100vw', margin: 0, flexWrap: 'wrap', rowGap: 'clamp(2px, 0.5vw, 6px)', columnGap: 'clamp(2px, 0.5vw, 6px)' }}>
+        <Box
+          sx={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: 2, // spacing between cards (theme spacing unit)
+            justifyContent: 'center', // optional: center-align cards
+          }}
+        >
+
           {cards.map((card, index) => (
-            <Grid item xs={12} sm={6} md={4} key={card.id} sx={{ minWidth: 0, flex: '1 1 0', maxWidth: '100vw' }}>
+            <Box
+              key={card.id}
+              sx={{
+                flex: '1 1 300px', // minimum width
+                maxWidth: '300px', // match clamp upper bound
+                display: 'flex',
+                justifyContent: 'center',
+              }}
+            >
               <Card
                 sx={{
-                  background:
-                    "linear-gradient(135deg, rgba(255, 126, 95, 0.15) 0%, rgba(254, 180, 123, 0.15) 100%)",
-                  backdropFilter: "blur(80px)",
-                  border: "1px solid rgba(255, 126, 95, 0.2)",
-                  borderRadius: "20px",
+                  background: 'linear-gradient(135deg, #fff 0%, #fff 100%)',
+                  backdropFilter: 'blur(80px)',
+                  border: '1px solid rgba(255, 126, 95, 0.2)',
+                  borderRadius: '20px',
+                  width: 'clamp(300px, 50vw, 420px)', // responsive width
                   height: 'clamp(180px, 28vw, 240px)',
-                  boxShadow: "0 4px 12px rgba(255, 153, 102, 0.1)",
-                  transition: "transform 0.3s ease, box-shadow 0.3s ease",
-                  cursor: "pointer",
-                  overflow: "hidden",
+                  boxShadow: '0 4px 12px rgba(255, 153, 102, 0.1)',
+                  transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                  cursor: 'pointer',
+                  overflow: 'hidden',
                   animation: `fadeInUp 0.6s ease ${index * 0.1}s both`,
-                  "&:hover": {
-                    transform: "scale(1.015)",
-                    boxShadow: "0 8px 24px rgba(255, 153, 102, 0.2)",
+                  '&:hover': {
+                    transform: 'scale(1.015)',
+                    boxShadow: '0 8px 24px rgba(255, 153, 102, 0.2)',
                   },
-                  maxWidth: '100vw',
                 }}
               >
                 <CardContent
                   sx={{
-                    padding: 'clamp(16px, 3vw, 28px)',
+                    padding: "clamp(16px, 3vw, 28px)",
                     height: "100%",
                     position: "relative",
                     zIndex: 2,
@@ -296,9 +307,9 @@ const Dashboard = () => {
                   </Typography>
                 </CardContent>
               </Card>
-            </Grid>
+            </Box>
           ))}
-        </Grid>
+        </Box>
       </main>
 
       <style>{`
