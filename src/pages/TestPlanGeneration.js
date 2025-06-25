@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
 import axiosInstance from "../api/axiosInstance";
-import { LoginRequiredModal, checkAuthentication } from "../components/VerifiedPopup";
 import { Download, Send, User, Bot, MessageSquare } from "lucide-react";
 import { FaDownload } from "react-icons/fa";
 import { Autocomplete, TextField } from '@mui/material';
@@ -18,10 +17,7 @@ const TestPlanGeneration = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [downloadReady, setDownloadReady] = useState(false);
-  const [showLoginModal, setShowLoginModal] = useState(false);
   const chatContainerRef = useRef(null);
-
-  const [isAuthenticated, setIsAuthenticated] = useState(checkAuthentication());
 
   const inferTestType = (filename) => {
     const lower = filename.toLowerCase();
@@ -29,21 +25,6 @@ const TestPlanGeneration = () => {
     if (lower.includes("api")) return "API";
     return "Other";
   };
-
-
-  useEffect(() => {
-    const onStorageChange = () => {
-      setIsAuthenticated(checkAuthentication());
-    };
-
-    window.addEventListener('storage', onStorageChange);
-    window.addEventListener('local-storage-changed', onStorageChange);
-
-    return () => {
-      window.removeEventListener('storage', onStorageChange);
-      window.removeEventListener('local-storage-changed', onStorageChange);
-    };
-  }, []);
 
   useEffect(() => {
     if (chatContainerRef.current) {
@@ -53,9 +34,6 @@ const TestPlanGeneration = () => {
 
   const handleSend = async () => {
     if (!message.trim()) return;
-
-    // Check authentication before sending message
-    if (!checkAuth('send_message')) return;
 
     const currentMessage = message;
     setChat((prev) => [...prev, { type: "user", text: currentMessage }]);
@@ -133,8 +111,6 @@ const TestPlanGeneration = () => {
     }
   };
 
-
-
   const fetchHistory = async () => {
     try {
       const res = await axiosInstance.get("/list-files?type=jmx");
@@ -151,33 +127,145 @@ const TestPlanGeneration = () => {
     }
   };
 
-
   useEffect(() => {
     fetchHistory();
   }, []);
 
-
-
-  // Function to check authentication before performing actions
-  const checkAuth = (action) => {
-    if (!isAuthenticated) {
-      setShowLoginModal(true);
-      return false;
-    }
-    return true;
-  };
   const filteredHistory = history.filter((item) =>
     item.filename.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-
   return (
     <div className="tp-root enhanced-bg">
-      {/* Login Required Modal */}
-      <LoginRequiredModal
-        isOpen={showLoginModal}
-        onClose={() => setShowLoginModal(false)}
-      />
+      <div className="tp-main" style={{ position: 'relative', zIndex: 1 }}>
+        {/* Decorative SVG blob behind header */}
+        <svg className="tp-header-blob" viewBox="0 0 320 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="160" cy="80" rx="160" ry="80" fill="#FFE0B2" fillOpacity="0.7" />
+        </svg>
+
+        <div className="tp-header">
+          <div className="tp-header-title">Create Test Plan</div>
+          <div className="tp-header-desc">Unlocking Insights, Enhancing Precision!</div>
+        </div>
+
+        <div className="tp-panels">
+          {/* ✅ Swapped: Generator Panel First */}
+          <div className="tp-panel tp-panel-chat">
+            <div className="tp-panel-title flex items-center gap-2">
+              <MessageSquare size={18} />
+              JMeter Test Generator
+            </div>
+            <hr className="tp-section-divider" />
+
+            <div className="tp-download-section">
+              <button
+                className={`tp-btn-primary`}
+                onClick={handleDownload}
+                disabled={!downloadReady}
+              >
+                <Download className="inline mr-1" size={18} />
+                Download JMX
+              </button>
+            </div>
+
+            <div ref={chatContainerRef} className="tp-chat-container">
+              {chat.map((msg, idx) => (
+                <div
+                  key={idx}
+                  className={`tp-chat-bubble${msg.type === "user" ? " tp-chat-bubble-user" : ""}`}
+                >
+                  <div className="tp-chat-sender flex items-center gap-1">
+                    {msg.type === "user" ? <User size={16} /> : <Bot size={16} />}
+                    {msg.type === "user" ? "You" : "Assistant"}
+                  </div>
+                  <div className="tp-chat-bubble-content">{msg.text}</div>
+                </div>
+              ))}
+            </div>
+
+            <hr className="tp-section-divider" />
+
+            <div className="tp-chat-input-row">
+              <input
+                type="text"
+                className={`tp-chat-input`}
+                placeholder={
+                  isLoading
+                    ? "Generating response..."
+                    : "Type your message here..."
+                }
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && !isLoading && handleSend()}
+                disabled={isLoading}
+              />
+              <button
+                className={`tp-btn-primary`}
+                onClick={handleSend}
+                disabled={isLoading}
+              >
+                <Send size={16} className="inline mr-1" />
+                {isLoading ? "..." : "Send"}
+              </button>
+            </div>
+          </div>
+
+          {/* ✅ History Panel Second (Right) */}
+          <div className="tp-panel tp-panel-history">
+            <div className="tp-panel-title">History</div>
+
+            <div className="tp-history-search">
+              <TextField
+                placeholder="Search tests..."
+                size="small"
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: 'var(--tp-radius-sm)',
+                    backgroundColor: 'var(--tp-white)',
+                    '& fieldset': {
+                      borderColor: 'var(--tp-border)',
+                    },
+                    '&:hover fieldset': {
+                      borderColor: 'var(--tp-orange)',
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: 'var(--tp-orange)',
+                    },
+                  },
+                }}
+              />
+            </div>
+
+            <div className="tp-history-list">
+              {filteredHistory.length > 0 ? (
+                filteredHistory.map((item, index) => (
+                  <div
+                    className="tp-history-card"
+                    key={index}
+                    style={{ cursor: "pointer", display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}
+                  >
+                    <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+                      <div className="tp-history-filename">{item.filename}</div>
+                      <div className="tp-history-meta">Created: {item.date}</div>
+                    </div>
+                    <FaDownload
+                      style={{ fontSize: '18px', color: '#FF6D00', cursor: 'pointer', marginLeft: '8px', transition: 'color 0.2s' }}
+                      title="Download file"
+                      onClick={e => { e.stopPropagation(); handleDownload(item.filename); }}
+                      onMouseEnter={e => e.currentTarget.style.color = '#e65c00'}
+                      onMouseLeave={e => e.currentTarget.style.color = '#FF6D00'}
+                    />
+                  </div>
+                ))
+              ) : (
+                <div className="tp-history-meta">No test plans generated yet.</div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
 
       <style>{`
         body {
@@ -707,152 +795,7 @@ const TestPlanGeneration = () => {
             padding: clamp(4px, 2vw, 8px) !important;
           }
         }
-        /* Unauthenticated user styling */
-        .tp-chat-input.unauthenticated {
-          opacity: 0.6;
-          cursor: not-allowed;
-        }
-        .tp-btn-primary.unauthenticated {
-          opacity: 0.6;
-          cursor: not-allowed;
-        }
-        .tp-btn-primary.unauthenticated:hover {
-          background: #ccc;
-          box-shadow: none;
-        }
       `}</style>
-
-      <div className="tp-main" style={{ position: 'relative', zIndex: 1 }}>
-        {/* Decorative SVG blob behind header */}
-        <svg className="tp-header-blob" viewBox="0 0 320 160" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <ellipse cx="160" cy="80" rx="160" ry="80" fill="#FFE0B2" fillOpacity="0.7" />
-        </svg>
-
-        <div className="tp-header">
-          <div className="tp-header-title">Create Test Plan</div>
-          <div className="tp-header-desc">Unlocking Insights, Enhancing Precision!</div>
-        </div>
-
-        <div className="tp-panels">
-          {/* ✅ Swapped: Generator Panel First */}
-          <div className="tp-panel tp-panel-chat">
-            <div className="tp-panel-title flex items-center gap-2">
-              <MessageSquare size={18} />
-              JMeter Test Generator
-            </div>
-            <hr className="tp-section-divider" />
-
-            <div className="tp-download-section">
-              <button
-                className={`tp-btn-primary ${!isAuthenticated ? 'unauthenticated' : ''}`}
-                onClick={handleDownload}
-                disabled={!isAuthenticated || !downloadReady}
-              >
-                <Download className="inline mr-1" size={18} />
-                Download JMX
-              </button>
-            </div>
-
-            <div ref={chatContainerRef} className="tp-chat-container">
-              {chat.map((msg, idx) => (
-                <div
-                  key={idx}
-                  className={`tp-chat-bubble${msg.type === "user" ? " tp-chat-bubble-user" : ""}`}
-                >
-                  <div className="tp-chat-sender flex items-center gap-1">
-                    {msg.type === "user" ? <User size={16} /> : <Bot size={16} />}
-                    {msg.type === "user" ? "You" : "Assistant"}
-                  </div>
-                  <div className="tp-chat-bubble-content">{msg.text}</div>
-                </div>
-              ))}
-            </div>
-
-            <hr className="tp-section-divider" />
-
-            <div className="tp-chat-input-row">
-              <input
-                type="text"
-                className={`tp-chat-input ${!isAuthenticated ? 'unauthenticated' : ''}`}
-                placeholder={
-                  isLoading
-                    ? "Generating response..."
-                    : (!isAuthenticated ? "Please log in to chat..." : "Type your message here...")
-                }
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && !isLoading && handleSend()}
-                disabled={isLoading || !isAuthenticated}
-              />
-              <button
-                className={`tp-btn-primary ${!isAuthenticated ? 'unauthenticated' : ''}`}
-                onClick={handleSend}
-                disabled={isLoading || !isAuthenticated}
-              >
-                <Send size={16} className="inline mr-1" />
-                {isLoading ? "..." : "Send"}
-              </button>
-            </div>
-          </div>
-
-          {/* ✅ History Panel Second (Right) */}
-          <div className="tp-panel tp-panel-history">
-            <div className="tp-panel-title">History</div>
-
-            <div className="tp-history-search">
-              <TextField
-                placeholder="Search tests..."
-                size="small"
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: 'var(--tp-radius-sm)',
-                    backgroundColor: 'var(--tp-white)',
-                    '& fieldset': {
-                      borderColor: 'var(--tp-border)',
-                    },
-                    '&:hover fieldset': {
-                      borderColor: 'var(--tp-orange)',
-                    },
-                    '&.Mui-focused fieldset': {
-                      borderColor: 'var(--tp-orange)',
-                    },
-                  },
-                }}
-              />
-            </div>
-
-            <div className="tp-history-list">
-              {filteredHistory.length > 0 ? (
-                filteredHistory.map((item, index) => (
-                  <div
-                    className="tp-history-card"
-                    key={index}
-                    style={{ cursor: "pointer", display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}
-                  >
-                    <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
-                      <div className="tp-history-filename">{item.filename}</div>
-                      <div className="tp-history-meta">Created: {item.date}</div>
-                    </div>
-                    <FaDownload
-                      style={{ fontSize: '18px', color: '#FF6D00', cursor: 'pointer', marginLeft: '8px', transition: 'color 0.2s' }}
-                      title="Download file"
-                      onClick={e => { e.stopPropagation(); handleDownload(item.filename); }}
-                      onMouseEnter={e => e.currentTarget.style.color = '#e65c00'}
-                      onMouseLeave={e => e.currentTarget.style.color = '#FF6D00'}
-                    />
-                  </div>
-                ))
-              ) : (
-                <div className="tp-history-meta">No test plans generated yet.</div>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-
-
     </div>
   );
 };

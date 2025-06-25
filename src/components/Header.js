@@ -2,13 +2,11 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaUser, FaPowerOff, FaClock, FaCog, FaSignOutAlt } from "react-icons/fa";
 import axiosInstance from "../api/axiosInstance";
-import { useAuthContext } from '../context/AuthContext';
 
 const Header = ({ licenseStatus, isMobile, sidebarOpen, setSidebarOpen, dropdownOpen, setDropdownOpen, onLogout }) => {
   const navigate = useNavigate();
   const [license, setLicense] = useState("Loading...");
   const [isExpiringSoon, setIsExpiringSoon] = useState(false);
-  const { isAuthenticated } = useAuthContext();
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
@@ -326,7 +324,7 @@ const Header = ({ licenseStatus, isMobile, sidebarOpen, setSidebarOpen, dropdown
 };
 
 // Export the dropdown as a separate component for use in Layout.js
-export const SettingsDropdown = ({ open, onClose, navigate, license, isAuthenticated, handleLogout, handleUpgrade }) => {
+export const SettingsDropdown = ({ open, onClose, navigate, license, handleLogout, handleUpgrade }) => {
   if (!open) return null;
   return (
     <div
@@ -402,25 +400,23 @@ export const SettingsDropdown = ({ open, onClose, navigate, license, isAuthentic
           <FaUser style={{ color: "#FF6D00" }} /> Upgrade to Premium
         </div>
         <div style={{ height: "1px", background: "rgba(255,255,255,0.1)" }} />
-        {isAuthenticated && (
-          <div
-            onClick={() => { onClose(); handleLogout(); }}
-            style={{ 
-              display: "flex", 
-              alignItems: "center", 
-              gap: "10px", 
-              cursor: "pointer", 
-              color: "#fff",
-              padding: "8px",
-              borderRadius: "6px",
-              transition: "all 0.2s ease"
-            }}
-            onMouseEnter={e => e.currentTarget.style.background = "rgba(255, 255, 255, 0.1)"}
-            onMouseLeave={e => e.currentTarget.style.background = "transparent"}
-          >
-            <FaSignOutAlt style={{ color: "#f5576c" }} /> Sign out
-          </div>
-        )}
+        <div
+          onClick={() => { onClose(); handleLogout(); }}
+          style={{ 
+            display: "flex", 
+            alignItems: "center", 
+            gap: "10px", 
+            cursor: "pointer", 
+            color: "#fff",
+            padding: "8px",
+            borderRadius: "6px",
+            transition: "all 0.2s ease"
+          }}
+          onMouseEnter={e => e.currentTarget.style.background = "rgba(255, 255, 255, 0.1)"}
+          onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+        >
+          <FaSignOutAlt style={{ color: "#f5576c" }} /> Sign out
+        </div>
       </div>
     </div>
   );

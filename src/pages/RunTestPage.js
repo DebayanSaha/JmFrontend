@@ -18,7 +18,6 @@ import {
   TextField,
   Paper,
 } from "@mui/material";
-import { LoginRequiredModal, checkAuthentication } from "../components/VerifiedPopup";
 
 const RunTestPage = () => {
   const [availableFiles, setAvailableFiles] = useState([]);
@@ -30,40 +29,44 @@ const RunTestPage = () => {
   const [history, setHistory] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [summaryOutput, setSummaryOutput] = useState("");
-  const [showLoginModal, setShowLoginModal] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(checkAuthentication());
 
   useEffect(() => {
-    const onStorageChange = () => {
-      setIsAuthenticated(checkAuthentication());
+    const fetchJMXFiles = async () => {
+      try {
+        const res = await axiosInstance.get("/list-files?type=jmx");
+
+        setAvailableFiles((res.data || []).map(file => file.filename));
+
+
+      } catch (err) {
+        console.error("Failed to fetch .jmx files:", err);
+      }
     };
 
-    window.addEventListener('storage', onStorageChange);
-    window.addEventListener('local-storage-changed', onStorageChange);
+    const fetchJTLHistory = async () => {
+      try {
+        const res = await axiosInstance.get("/list-files?type=jtl");
 
-    return () => {
-      window.removeEventListener('storage', onStorageChange);
-      window.removeEventListener('local-storage-changed', onStorageChange);
+        const parsedHistory = (res.data || []).map(file => ({
+          filename: file.filename,
+          date: new Date(file.last_modified).toLocaleString(),
+        }));
+        setHistory(parsedHistory);
+
+      } catch (err) {
+        console.error("Error fetching JTL history:", err);
+      }
     };
+
+    fetchJMXFiles();
+    fetchJTLHistory();
   }, []);
-
-  // Function to check authentication before performing actions
-  const checkAuth = (action) => {
-    if (!isAuthenticated) {
-      setShowLoginModal(true);
-      return false;
-    }
-    return true;
-  };
 
   const handleRunTest = async () => {
     if (!selectedFilename) {
       alert("Please select a JMX file to run the test");
       return;
     }
-
-    // Check authentication before running test
-    if (!checkAuth('run_test')) return;
 
     setSummaryOutput("");
 
@@ -168,47 +171,8 @@ const RunTestPage = () => {
     item.filename.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  useEffect(() => {
-    const fetchJMXFiles = async () => {
-      try {
-        const res = await axiosInstance.get("/list-files?type=jmx");
-
-        setAvailableFiles((res.data || []).map(file => file.filename));
-
-
-      } catch (err) {
-        console.error("Failed to fetch .jmx files:", err);
-      }
-    };
-
-    const fetchJTLHistory = async () => {
-      try {
-        const res = await axiosInstance.get("/list-files?type=jtl");
-
-        const parsedHistory = (res.data || []).map(file => ({
-          filename: file.filename,
-          date: new Date(file.last_modified).toLocaleString(),
-        }));
-        setHistory(parsedHistory);
-
-      } catch (err) {
-        console.error("Error fetching JTL history:", err);
-      }
-    };
-
-    fetchJMXFiles();
-    fetchJTLHistory();
-  }, []);
-
-
   return (
     <div className="tp-root enhanced-bg">
-      {/* Login Required Modal */}
-      <LoginRequiredModal
-        isOpen={showLoginModal}
-        onClose={() => setShowLoginModal(false)}
-      />
-
       <style>{`
         body {
           background: linear-gradient(to bottom, #FFE9D0, #FFF3E0);
@@ -495,15 +459,12 @@ const RunTestPage = () => {
                 getOptionLabel={(option) => option}
                 value={selectedFilename || null}
                 onChange={(event, newValue) => setSelectedFilename(newValue || "")}
-                disabled={!isAuthenticated}
-                className={!isAuthenticated ? 'unauthenticated' : ''}
                 renderInput={(params) => (
                   <TextField
                     {...params}
-                    label={!isAuthenticated ? "Please log in to select files..." : "Select JMX File"}
-                    placeholder={!isAuthenticated ? "Please log in to select files..." : "Search or select a file"}
+                    label="Select JMX File"
+                    placeholder="Search or select a file"
                     variant="outlined"
-                    disabled={!isAuthenticated}
                     sx={{
                       '& .MuiOutlinedInput-root': {
                         borderRadius: '12px',
@@ -550,10 +511,9 @@ const RunTestPage = () => {
               <Button
                 variant="contained"
                 onClick={handleRunTest}
-                disabled={isLoading || !isAuthenticated}
-                className={!isAuthenticated ? 'unauthenticated' : ''}
+                disabled={isLoading}
                 sx={{
-                  background: isLoading || !isAuthenticated ? '#ccc' : '#FF6D00',
+                  background: isLoading ? '#ccc' : '#FF6D00',
                   color: 'white',
                   padding: '14px 32px',
                   border: 'none',
@@ -565,9 +525,9 @@ const RunTestPage = () => {
                   textTransform: 'none',
                   minWidth: '160px',
                   '&:hover': {
-                    background: isLoading || !isAuthenticated ? '#ccc' : '#e65c00',
-                    boxShadow: isLoading || !isAuthenticated ? 'none' : '0 6px 16px rgba(255, 109, 0, 0.4)',
-                    transform: isLoading || !isAuthenticated ? 'none' : 'translateY(-2px)'
+                    background: isLoading ? '#ccc' : '#e65c00',
+                    boxShadow: isLoading ? 'none' : '0 6px 16px rgba(255, 109, 0, 0.4)',
+                    transform: isLoading ? 'none' : 'translateY(-2px)'
                   },
                   '&:disabled': {
                     background: '#ccc',
@@ -577,17 +537,16 @@ const RunTestPage = () => {
                 }}
               >
                 <FaPlay style={{ marginRight: '8px', fontSize: '16px' }} />
-                {isLoading ? "Running..." : (!isAuthenticated ? "Please Log In" : "Run Test")}
+                {isLoading ? "Running..." : "Run Test"}
               </Button>
 
               <Button
                 variant="outlined"
                 onClick={handleDownload}
-                disabled={!isResultReady || !isAuthenticated}
-                className={!isAuthenticated ? 'unauthenticated' : ''}
+                disabled={!isResultReady}
                 sx={{
-                  color: !isAuthenticated ? '#666' : '#FF6D00',
-                  borderColor: !isAuthenticated ? '#666' : '#FF6D00',
+                  color: '#FF6D00',
+                  borderColor: '#FF6D00',
                   padding: '14px 32px',
                   borderRadius: '12px',
                   fontSize: '16px',
@@ -597,15 +556,15 @@ const RunTestPage = () => {
                   minWidth: '160px',
                   boxShadow: '0 4px 12px rgba(255, 109, 0, 0.1)',
                   '&:hover': {
-                    borderColor: !isAuthenticated ? '#666' : '#e65c00',
-                    color: !isAuthenticated ? '#666' : '#e65c00',
-                    background: !isAuthenticated ? 'transparent' : 'rgba(255, 109, 0, 0.04)',
-                    transform: !isAuthenticated ? 'none' : 'translateY(-2px)',
-                    boxShadow: !isAuthenticated ? 'none' : '0 6px 16px rgba(255, 109, 0, 0.25)'
+                    borderColor: '#e65c00',
+                    color: '#e65c00',
+                    background: 'rgba(255, 109, 0, 0.04)',
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0 6px 16px rgba(255, 109, 0, 0.25)'
                   },
                   '&:active': {
-                    transform: !isAuthenticated ? 'none' : 'translateY(-1px)',
-                    boxShadow: !isAuthenticated ? 'none' : '0 4px 12px rgba(255, 109, 0, 0.2)'
+                    transform: 'translateY(-1px)',
+                    boxShadow: '0 4px 12px rgba(255, 109, 0, 0.2)'
                   },
                   '&:disabled': {
                     borderColor: '#666',

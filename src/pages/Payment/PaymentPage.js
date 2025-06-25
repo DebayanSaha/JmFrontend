@@ -3,7 +3,6 @@ import axiosInstance from '../../api/axiosInstance';
 import { Zap, Check, Shield, Headphones, ArrowRight, CreditCard, DollarSign } from 'lucide-react';
 import Sidebar from '../../components/Sidebar';
 import Header from '../../components/Header';
-import { LoginRequiredModal, checkAuthentication } from '../../components/VerifiedPopup';
 import useResponsive from '../../useResponsive';
 
 const currenciesWithRates = [
@@ -57,28 +56,12 @@ function PaymentPage() {
   const [basePrice, setBasePrice] = useState(40000);
   const [discountedPrice, setDiscountedPrice] = useState(20000);
   const [totalPrice, setTotalPrice] = useState(20000);
-  const [showLoginModal, setShowLoginModal] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(checkAuthentication());
   
   const { isXs, isSm } = useResponsive();
   const isMobile = isXs || isSm;
   const sidebarWidth = sidebarOpen || sidebarHovered ? 280 : 70;
   const basePricePerMonthINR = 40000;
   const discountedPricePerMonthINR = 20000;
-
-  useEffect(() => {
-    const onStorageChange = () => {
-      setIsAuthenticated(checkAuthentication());
-    };
-
-    window.addEventListener('storage', onStorageChange);
-    window.addEventListener('local-storage-changed', onStorageChange);
-
-    return () => {
-      window.removeEventListener('storage', onStorageChange);
-      window.removeEventListener('local-storage-changed', onStorageChange);
-    };
-  }, []);
 
   useEffect(() => {
     const selected = currenciesWithRates.find(c => c.code === currency);
@@ -93,9 +76,6 @@ function PaymentPage() {
   }, [currency, months]);
 
   const handleGetPro = async () => {
-    // Check authentication before proceeding with payment
-    if (!checkAuth('payment')) return;
-
     try {
       const payload = {
         months,
@@ -159,15 +139,6 @@ function PaymentPage() {
     }
   };
 
-  // Function to check authentication before performing actions
-  const checkAuth = (action) => {
-    if (!isAuthenticated) {
-      setShowLoginModal(true);
-      return false;
-    }
-    return true;
-  };
-
   return (
     <div style={{
       minHeight: '100vh',
@@ -176,12 +147,6 @@ function PaymentPage() {
       overflow: 'hidden',
       fontFamily: "'Poppins', 'Inter', 'Segoe UI', Arial, sans-serif"
     }}>
-      {/* Login Required Modal */}
-      <LoginRequiredModal 
-        isOpen={showLoginModal} 
-        onClose={() => setShowLoginModal(false)} 
-      />
-
       {/* Sidebar Component */}
       <Sidebar
         isMobile={isMobile}
@@ -520,51 +485,35 @@ function PaymentPage() {
 
               <button
                 onClick={handleGetPro}
-                className={!isAuthenticated ? 'unauthenticated' : ''}
                 style={{
                   width: '100%',
-                  background: !isAuthenticated ? '#ccc' : '#FF6D00',
+                  background: '#FF6D00',
                   color: 'white',
                   fontWeight: '600',
                   padding: '16px 24px',
                   borderRadius: '12px',
                   border: 'none',
-                  cursor: !isAuthenticated ? 'not-allowed' : 'pointer',
+                  cursor: 'pointer',
                   fontSize: '16px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   gap: '8px',
-                  boxShadow: !isAuthenticated ? 'none' : '0 4px 12px rgba(255, 109, 0, 0.3)',
+                  boxShadow: '0 4px 12px rgba(255, 109, 0, 0.3)',
                   transition: 'all 0.3s ease',
                   position: 'relative',
-                  overflow: 'hidden',
-                  opacity: !isAuthenticated ? 0.6 : 1
-                }}
-                onMouseEnter={(e) => {
-                  if (isAuthenticated) {
-                    e.target.style.background = '#e65c00';
-                    e.target.style.boxShadow = '0 6px 16px rgba(255, 109, 0, 0.4)';
-                    e.target.style.transform = 'translateY(-2px)';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (isAuthenticated) {
-                    e.target.style.background = '#FF6D00';
-                    e.target.style.boxShadow = '0 4px 12px rgba(255, 109, 0, 0.3)';
-                    e.target.style.transform = 'translateY(0)';
-                  }
+                  overflow: 'hidden'
                 }}
               >
                 <span style={{ position: 'relative', zIndex: 2 }}>
-                  {!isAuthenticated ? 'Please Log In' : 'Get Pro Access'}
+                  Get Pro Access
                 </span>
                 <ArrowRight style={{ 
                   width: '20px', 
                   height: '20px',
                   position: 'relative',
                   zIndex: 2,
-                  animation: isAuthenticated ? 'bounceX 1s ease infinite' : 'none'
+                  animation: 'bounceX 1s ease infinite'
                 }} />
                 <div style={{
                   position: 'absolute',

@@ -4,8 +4,6 @@ import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 
 import axiosInstance, { setNavigate } from './api/axiosInstance';
 
-import { updateAuth } from './context/AuthContext';
- 
 import Dashboard from './pages/Dashboard';
 
 import IntelligentTestAnalysis from './pages/IntelligentTestAnalysis';
@@ -19,8 +17,6 @@ import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 
 import ForgotAndResetPasswordPage from './pages/ForgotAndResetPasswordPage';
-
-import VerifiedPopup from './components/VerifiedPopup';
 
 import Layout from './Layout';
 
@@ -172,8 +168,6 @@ const AppRouter = () => {
 
     setLicenseStatus(evaluateLicense(userData));
 
-    updateAuth();
-
     setLoginTriggered(prev => !prev); // trigger reauth
  
     const publicPaths = ['/login', '/signup', '/forgot-password', '/verified-popup'];
@@ -211,7 +205,6 @@ const AppRouter = () => {
       />
 <Route path="/signup" element={!isAuthenticated ? <SignupPage /> : <Navigate to="/dashboard" replace />} />
 <Route path="/forgot-password" element={!isAuthenticated ? <ForgotAndResetPasswordPage /> : <Navigate to="/dashboard" replace />} />
-<Route path="/verified-popup" element={<VerifiedPopup />} />
  
       {/* Protected App Layout */}
 <Route element={<Layout licenseStatus={licenseStatus} />}>

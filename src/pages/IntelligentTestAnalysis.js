@@ -19,7 +19,6 @@ import axiosInstance from "../api/axiosInstance";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
-import { LoginRequiredModal, checkAuthentication } from "../components/VerifiedPopup";
 
 function IntelligentTestAnalysis() {
   const [selectedFilename, setSelectedFilename] = useState("");
@@ -28,38 +27,12 @@ function IntelligentTestAnalysis() {
   const [history, setHistory] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [availableFiles, setAvailableFiles] = useState([]);
-  const [showLoginModal, setShowLoginModal] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(checkAuthentication());
-
-  useEffect(() => {
-    const onStorageChange = () => {
-      setIsAuthenticated(checkAuthentication());
-    };
-
-    window.addEventListener("storage", onStorageChange);
-    window.addEventListener("local-storage-changed", onStorageChange);
-
-    return () => {
-      window.removeEventListener("storage", onStorageChange);
-      window.removeEventListener("local-storage-changed", onStorageChange);
-    };
-  }, []);
-
-  const checkAuth = (action) => {
-    if (!isAuthenticated) {
-      setShowLoginModal(true);
-      return false;
-    }
-    return true;
-  };
 
   const handleAnalyze = async () => {
     if (!selectedFilename) {
       alert("Please select a JTL file to analyze");
       return;
     }
-
-    if (!checkAuth("analyze")) return;
 
     setAnalyzing(true);
     try {
@@ -103,8 +76,6 @@ function IntelligentTestAnalysis() {
       alert("Please analyze a file first.");
       return;
     }
-
-    if (!checkAuth("email")) return;
 
     try {
       const res = await axiosInstance.post("/sendEmail", {
@@ -150,14 +121,6 @@ function IntelligentTestAnalysis() {
 
   return (
     <div className="tp-root enhanced-bg">
-      {/* Login Required Modal */}
-      <LoginRequiredModal
-        isOpen={showLoginModal}
-        onClose={() => setShowLoginModal(false)}
-      />
-
-
-
       <style>{`
         body {
           background: linear-gradient(to bottom, #FFE9D0, #FFF3E0);
@@ -437,11 +400,10 @@ function IntelligentTestAnalysis() {
                 renderInput={(params) => (
                   <TextField
                     {...params}
-                    label={!isAuthenticated ? "Please log in to select files..." : "Select JTL File"}
+                    label="Select JTL File"
                     variant="outlined"
                     fullWidth
                     size="small"
-                    disabled={!isAuthenticated}
                     InputProps={{
                       ...params.InputProps,
                       style: {
@@ -464,23 +426,22 @@ function IntelligentTestAnalysis() {
               {/* Action Buttons */}
               <button
                 onClick={handleAnalyze}
-                disabled={analyzing || !isAuthenticated}
-                className={!isAuthenticated ? 'unauthenticated' : ''}
+                disabled={analyzing}
                 style={{
                   width: "100%",
-                  background: analyzing || !isAuthenticated ? "#ccc" : "#FF6D00",
+                  background: analyzing ? "#ccc" : "#FF6D00",
                   color: "white",
                   padding: "12px 24px",
                   border: "none",
                   borderRadius: "12px",
                   fontWeight: "600",
                   marginBottom: "16px",
-                  cursor: analyzing || !isAuthenticated ? "not-allowed" : "pointer",
+                  cursor: analyzing ? "not-allowed" : "pointer",
                   boxShadow: "0 4px 12px rgba(255, 109, 0, 0.3)",
                   transition: "all 0.3s ease-in-out"
                 }}
               >
-                {analyzing ? "Analyzing..." : (!isAuthenticated ? "Please Log In" : "Analyze File")}
+                {analyzing ? "Analyzing..." : "Analyze File"}
               </button>
 
               <div style={{
@@ -489,8 +450,7 @@ function IntelligentTestAnalysis() {
               }}>
                 <button
                   onClick={handleDownload}
-                  disabled={!analysisResult || !isAuthenticated}
-                  className={!isAuthenticated ? 'unauthenticated' : ''}
+                  disabled={!analysisResult}
                   style={{
                     flex: 1,
                     background: "#FFFFFF",
@@ -499,8 +459,8 @@ function IntelligentTestAnalysis() {
                     border: "1px solid #FF6D00",
                     borderRadius: "8px",
                     fontWeight: "600",
-                    cursor: analysisResult && isAuthenticated ? "pointer" : "not-allowed",
-                    opacity: analysisResult && isAuthenticated ? 1 : 0.5,
+                    cursor: analysisResult ? "pointer" : "not-allowed",
+                    opacity: analysisResult ? 1 : 0.5,
                     transition: "all 0.3s ease"
                   }}
                 >
@@ -516,8 +476,7 @@ function IntelligentTestAnalysis() {
 
                 <button
                   onClick={handleEmail}
-                  disabled={!analysisResult || !isAuthenticated}
-                  className={!isAuthenticated ? 'unauthenticated' : ''}
+                  disabled={!analysisResult}
                   style={{
                     flex: 1,
                     background: "#FFFFFF",
@@ -526,8 +485,8 @@ function IntelligentTestAnalysis() {
                     border: "1px solid #FF6D00",
                     borderRadius: "8px",
                     fontWeight: "600",
-                    cursor: analysisResult && isAuthenticated ? "pointer" : "not-allowed",
-                    opacity: analysisResult && isAuthenticated ? 1 : 0.5,
+                    cursor: analysisResult ? "pointer" : "not-allowed",
+                    opacity: analysisResult ? 1 : 0.5,
                     transition: "all 0.3s ease"
                   }}
                 >
@@ -752,12 +711,12 @@ function IntelligentTestAnalysis() {
                       color: "#FF6D00",
                       marginBottom: "8px"
                     }}>
-                      {!isAuthenticated ? "Please Log In to Analyze" : "No Analysis Results Yet"}
+                      No Analysis Results Yet
                     </Typography>
                     <Typography variant="body2" style={{
                       color: "#666666"
                     }}>
-                      {!isAuthenticated ? "Log in to access analysis features" : "Select a JTL file and click 'Analyze File' to see intelligent insights"}
+                      Select a JTL file and click 'Analyze File' to see intelligent insights
                     </Typography>
                   </div>
                 )}
