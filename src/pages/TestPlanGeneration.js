@@ -115,7 +115,11 @@ const TestPlanGeneration = () => {
   function formatDateSafe(dateString) {
     if (!dateString) return "Unknown";
     const date = new Date(dateString);
-    return isNaN(date.getTime()) ? "Unknown" : date.toLocaleString();
+    if (isNaN(date.getTime())) return "Unknown";
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
   }
 
   const fetchHistory = async () => {
