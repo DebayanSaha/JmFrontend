@@ -565,7 +565,7 @@ const RunTestPage = () => {
 
               <Button
                 variant="outlined"
-                onClick={handleDownload}
+                onClick={() => handleDownload(resultFile)}
                 disabled={!isResultReady}
                 sx={{
                   color: '#FF6D00',

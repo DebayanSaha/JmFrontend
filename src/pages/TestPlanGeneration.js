@@ -174,7 +174,7 @@ const TestPlanGeneration = () => {
             <div className="tp-download-section">
               <button
                 className={`tp-btn-primary`}
-                onClick={handleDownload}
+                onClick={() => handleDownload(jmxFilename)}
                 disabled={!downloadReady}
               >
                 <Download className="inline mr-1" size={18} />

@@ -476,7 +476,7 @@ function IntelligentTestAnalysis() {
                 gap: "8px"
               }}>
                 <button
-                  onClick={handleDownload}
+                  onClick={() => handleDownload(selectedFilename)}
                   disabled={!analysisResult}
                   style={{
                     flex: 1,
