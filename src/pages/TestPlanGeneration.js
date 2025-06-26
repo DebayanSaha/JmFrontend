@@ -171,17 +171,6 @@ const TestPlanGeneration = () => {
             </div>
             <hr className="tp-section-divider" />
 
-            <div className="tp-download-section">
-              <button
-                className={`tp-btn-primary`}
-                onClick={() => handleDownload(jmxFilename)}
-                disabled={!downloadReady}
-              >
-                <Download className="inline mr-1" size={18} />
-                Download JMX
-              </button>
-            </div>
-
             <div ref={chatContainerRef} className="tp-chat-container">
               {chat.map((msg, idx) => (
                 <div
@@ -200,8 +189,7 @@ const TestPlanGeneration = () => {
             <hr className="tp-section-divider" />
 
             <div className="tp-chat-input-row">
-              <input
-                type="text"
+              <textarea
                 className={`tp-chat-input`}
                 placeholder={
                   isLoading
@@ -210,17 +198,33 @@ const TestPlanGeneration = () => {
                 }
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && !isLoading && handleSend()}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey && !isLoading) {
+                    e.preventDefault();
+                    handleSend();
+                  }
+                }}
                 disabled={isLoading}
+                rows={1}
               />
-              <button
-                className={`tp-btn-primary`}
-                onClick={handleSend}
-                disabled={isLoading}
-              >
-                <Send size={16} className="inline mr-1" />
-                {isLoading ? "..." : "Send"}
-              </button>
+              <div className="tp-button-group">
+                <button
+                  className={`tp-btn-primary`}
+                  onClick={handleSend}
+                  disabled={isLoading}
+                >
+                  <Send size={16} className="inline mr-1" />
+                  {isLoading ? "..." : "Send"}
+                </button>
+                <button
+                  className={`tp-btn-primary`}
+                  onClick={() => handleDownload(jmxFilename)}
+                  disabled={!downloadReady}
+                >
+                  <Download className="inline mr-1" size={16} />
+                  Download JMX
+                </button>
+              </div>
             </div>
           </div>
 
@@ -557,10 +561,6 @@ const TestPlanGeneration = () => {
           margin-right: 6px;
         }
         /* Chat Section */
-        .tp-download-section {
-          text-align: center;
-          margin-bottom: 18px;
-        }
         .tp-chat-container {
           background: var(--tp-gray);
           border-radius: 14px;
@@ -589,7 +589,6 @@ const TestPlanGeneration = () => {
           bottom: 0; left: 0; right: 0;
           height: 18px;
           pointer-events: none;
-          background: linear-gradient(to bottom, rgba(255,255,255,0), #fff8f1 90%);
         }
         .tp-chat-bubble {
           display: flex;
@@ -626,6 +625,20 @@ const TestPlanGeneration = () => {
         .tp-chat-input-row {
           display: flex;
           gap: 12px;
+          align-items: stretch;
+          width: 100%;
+          margin-bottom: 0;
+          margin-top: 0;
+          position: relative;
+          min-height: 72px;
+          overflow-x: auto;
+          overflow-y: auto;
+          /* Hide scrollbar for all browsers */
+          scrollbar-width: none; /* Firefox */
+          -ms-overflow-style: none;  /* IE and Edge */
+        }
+        .tp-chat-input-row::-webkit-scrollbar {
+          display: none; /* Chrome, Safari, Opera */
         }
         .tp-chat-input {
           flex: 1;
@@ -637,7 +650,19 @@ const TestPlanGeneration = () => {
           transition: all 0.3s ease;
           box-shadow: 0 0 0 4px rgba(255, 109, 0, 0.1);
           position: relative;
-          overflow: hidden;
+          resize: vertical;
+          min-height: 48px;
+          max-height: 120px;
+          word-wrap: break-word;
+          overflow-wrap: break-word;
+          white-space: pre-wrap;
+          font-family: inherit;
+        }
+        .tp-chat-input::-webkit-scrollbar {
+          width: 0px;
+          height: 0px;
+          background: transparent;
+          display: none;
         }
         .tp-chat-input::placeholder {
           color: rgba(255, 109, 0, 0.6);
@@ -654,20 +679,29 @@ const TestPlanGeneration = () => {
           box-shadow: 0 0 0 4px rgba(255, 109, 0, 0.15);
           transform: translateY(-1px);
         }
+        .tp-button-group {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+          min-height: 48px;
+        }
         .tp-btn-primary {
           background: var(--tp-orange);
           color: #fff;
           border: none;
           border-radius: var(--tp-radius-sm);
-          padding: 12px 24px;
-          font-size: 15px;
+          padding: 12px 20px;
+          font-size: 14px;
           font-weight: 700;
           cursor: pointer;
           transition: background 0.2s, box-shadow 0.2s;
           display: flex;
           align-items: center;
-          gap: 8px;
+          justify-content: center;
+          gap: 6px;
           box-shadow: var(--tp-btn-shadow);
+          min-height: 20px;
+          white-space: nowrap;
         }
         .tp-btn-primary:disabled {
           background: #ccc;
@@ -707,6 +741,14 @@ const TestPlanGeneration = () => {
           .tp-panel {
             padding: 10px;
           }
+          .tp-button-group {
+            flex-direction: row;
+            gap: 8px;
+          }
+          .tp-btn-primary {
+            font-size: 12px;
+            padding: 10px 16px;
+          }
         }
         @media (max-width: 480px) {
           .tp-main {
@@ -718,6 +760,14 @@ const TestPlanGeneration = () => {
           }
           .tp-panel {
             padding: 6px;
+          }
+          .tp-button-group {
+            flex-direction: column;
+            gap: 6px;
+          }
+          .tp-btn-primary {
+            font-size: 11px;
+            padding: 8px 12px;
           }
         }
         /* Enhanced Responsive Breakpoints */
