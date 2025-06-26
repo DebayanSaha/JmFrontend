@@ -92,7 +92,7 @@ const ProfilePage = () => {
         amount: 100,
         currency: 'INR',
         order_id,
-        name: 'JMeterAI',
+        name: 'KickLoad',
         description: 'Card verification',
         handler: async function (response) {
           const verifyRes = await axiosInstance.post('/payments/verify-and-save-card', {

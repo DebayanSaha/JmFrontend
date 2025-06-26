@@ -107,7 +107,7 @@ const LoginPage = ({ onLoginSuccess }) => {
         <div className="signup-card">
           <div className="signup-header">
             <div className="signup-icon"><LogIn size={24} /></div>
-            <h1 className="signup-title">JmeterAI</h1>
+            <h1 className="signup-title"> KickLoad</h1>
             <p className="signup-subtitle">Sign in to your account</p>
           </div>
 

@@ -124,7 +124,7 @@ const Header = ({ licenseStatus, isMobile, sidebarOpen, setSidebarOpen, dropdown
           minWidth: 0,
         }}
       >
-        JMeterAI
+        KickLoad
       </div>
 
       <div style={{

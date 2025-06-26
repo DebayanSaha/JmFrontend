@@ -371,7 +371,7 @@ function IntelligentTestAnalysis() {
             whiteSpace: 'normal',
             overflowWrap: 'break-word',
           }}>
-            Unlocking Insights from JMeterAI Test Runs
+            Unlocking Insights from KickLoad Test Runs
           </div>
         </div>
 
