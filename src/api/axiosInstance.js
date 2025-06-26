@@ -4,7 +4,8 @@ let navigateRef = null;
  
 const axiosInstance = axios.create({
   baseURL: process.env.REACT_APP_API_BASE_URL,
-  withCredentials: true, // ✅ Send cookies with each request
+  withCredentials: true,
+  timeout: 120000, // ⏱️ Add this line
 });
  
 // ✅ Set navigate for use in interceptors
