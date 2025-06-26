@@ -9,7 +9,7 @@ const TestPlanGeneration = () => {
   const [chat, setChat] = useState([
     {
       type: "bot",
-      text: "Hello! I can help you create a JMeter test plan. What kind of test would you like to create?",
+      text: "Hello! I can help you create a KickLoad test plan. What kind of test would you like to create?",
     },
   ]);
   const [jmxFilename, setJmxFilename] = useState("");
@@ -167,7 +167,7 @@ const TestPlanGeneration = () => {
           <div className="tp-panel tp-panel-chat card-transition">
             <div className="tp-panel-title flex items-center gap-2">
               <MessageSquare size={18} />
-              JMeter Test Generator
+              KickLoad Test Generator
             </div>
             <hr className="tp-section-divider" />
 

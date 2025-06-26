@@ -416,7 +416,7 @@ const RunTestPage = () => {
             maxWidth: '100%',
             wordBreak: 'break-word',
           }}>
-            Run JMeter Test
+            Run KickLoad Test
           </div>
           <div className="tp-header-desc" style={{
             fontSize: 'clamp(1rem, 3vw, 1.2rem)',
