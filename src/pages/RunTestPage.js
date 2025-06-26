@@ -125,7 +125,7 @@ const RunTestPage = () => {
               </span>
             );
 
-            const now = new Date().toLocaleString();
+            const now = formatDateSafe(new Date());
             const newEntry = {
               filename,
               date: now,

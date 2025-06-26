@@ -62,6 +62,17 @@ function IntelligentTestAnalysis() {
         response.data.analysis || JSON.stringify(response.data, null, 2);
 
       setAnalysisResult(markdownContent);
+      // Add new .md file to history immediately
+      let mdFilename = selectedFilename.replace(/\.jtl$/i, '.md');
+      if (!mdFilename.endsWith('.md')) mdFilename = selectedFilename + '.md';
+      setHistory(prev => {
+        // Avoid duplicate entries
+        if (prev.some(item => item.filename === mdFilename)) return prev;
+        return [
+          { filename: mdFilename, date: formatDateSafe(new Date()) },
+          ...prev
+        ];
+      });
     } catch (error) {
       console.error("Error analyzing file:", error);
       alert("Error analyzing file: " + (error.response?.data?.error || error.message));

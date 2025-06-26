@@ -59,7 +59,7 @@ const TestPlanGeneration = () => {
         setJmxFilename(filename);
         setDownloadReady(true);
 
-        const now = new Date().toLocaleString();
+        const now = formatDateSafe(new Date());
         const testType = currentMessage.toLowerCase().includes("load test")
           ? "Load Test"
           : currentMessage.toLowerCase().includes("api")
