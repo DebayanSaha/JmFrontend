@@ -589,6 +589,7 @@ const TestPlanGeneration = () => {
           bottom: 0; left: 0; right: 0;
           height: 18px;
           pointer-events: none;
+          background: linear-gradient(to bottom, rgba(255,255,255,0), #fff8f1 90%);
         }
         .tp-chat-bubble {
           display: flex;
@@ -631,38 +632,24 @@ const TestPlanGeneration = () => {
           margin-top: 0;
           position: relative;
           min-height: 72px;
-          overflow-x: auto;
-          overflow-y: auto;
-          /* Hide scrollbar for all browsers */
-          scrollbar-width: none; /* Firefox */
-          -ms-overflow-style: none;  /* IE and Edge */
-        }
-        .tp-chat-input-row::-webkit-scrollbar {
-          display: none; /* Chrome, Safari, Opera */
         }
         .tp-chat-input {
           flex: 1;
-          border-radius: var(--tp-radius-sm);
-          border: 2px solid #FF6D00;
-          padding: 12px;
-          font-size: 15px;
+          border-radius: 16px;
+          border: 2.5px solid #FF6D00;
+          padding: 22px 18px;
+          font-size: 18px;
           background: var(--tp-white);
           transition: all 0.3s ease;
-          box-shadow: 0 0 0 4px rgba(255, 109, 0, 0.1);
+          box-shadow: 0 0 0 6px rgba(255, 109, 0, 0.08);
           position: relative;
-          resize: vertical;
-          min-height: 48px;
-          max-height: 120px;
+          resize: none;
+          min-height: 72px;
+          max-height: 180px;
           word-wrap: break-word;
           overflow-wrap: break-word;
           white-space: pre-wrap;
           font-family: inherit;
-        }
-        .tp-chat-input::-webkit-scrollbar {
-          width: 0px;
-          height: 0px;
-          background: transparent;
-          display: none;
         }
         .tp-chat-input::placeholder {
           color: rgba(255, 109, 0, 0.6);
@@ -682,8 +669,9 @@ const TestPlanGeneration = () => {
         .tp-button-group {
           display: flex;
           flex-direction: column;
-          gap: 8px;
-          min-height: 48px;
+          gap: 12px;
+          min-height: 72px;
+          justify-content: center;
         }
         .tp-btn-primary {
           background: var(--tp-orange);
