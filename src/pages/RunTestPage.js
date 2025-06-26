@@ -365,6 +365,8 @@ const RunTestPage = () => {
             max-width: clamp(580px, 56vw, 780px) !important;
           }
         }
+        .tp-history-list:after {
+        }
       `}</style>
 
       <div className="tp-main" style={{

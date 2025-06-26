@@ -6,7 +6,7 @@ function App() {
   return (
     <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <div className="app-container">
-        <AppRouter />
+  <AppRouter />
       </div>
       <style>{`
         .app-container {
@@ -168,7 +168,7 @@ function App() {
           }
         }
       `}</style>
-    </BrowserRouter>
+</BrowserRouter>
   );
 }
 

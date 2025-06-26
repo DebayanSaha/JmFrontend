@@ -292,6 +292,15 @@ function IntelligentTestAnalysis() {
           opacity: 0.6;
           cursor: not-allowed;
         }
+        .tp-history-list:after {
+          content: '';
+          display: block;
+          position: absolute;
+          bottom: 0; left: 0; right: 0;
+          height: 18px;
+          pointer-events: none;
+          background: linear-gradient(to bottom, rgba(255,255,255,0), #fff8f1 90%);
+        }
       `}</style>
 
       <div className="tp-main" style={{

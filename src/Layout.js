@@ -115,13 +115,13 @@ function Layout({ licenseStatus, onLogout }) {
           <main 
             className="page-loaded"
             style={{
-              flexGrow: 1,
-              width: '100%',
+            flexGrow: 1,
+            width: '100%',
               maxWidth: '100%',
-              minHeight: 'calc(100vh - 80px)',
-              overflowX: 'hidden',
-              display: 'flex',
-              flexDirection: 'column',
+            minHeight: 'calc(100vh - 80px)',
+            overflowX: 'hidden',
+            display: 'flex',
+            flexDirection: 'column',
             }}
           >
             <Outlet />

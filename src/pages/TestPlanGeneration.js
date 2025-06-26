@@ -508,15 +508,6 @@ const TestPlanGeneration = () => {
           background: var(--tp-orange-light);
           border-radius: 8px;
         }
-        .tp-history-list:after {
-          content: '';
-          display: block;
-          position: absolute;
-          bottom: 0; left: 0; right: 0;
-          height: 18px;
-          pointer-events: none;
-          background: linear-gradient(to bottom, rgba(255,255,255,0), #fff8f1 90%);
-        }
         .tp-history-card {
           background: var(--tp-gray);
           border-radius: 12px;
