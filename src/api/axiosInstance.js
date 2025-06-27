@@ -5,7 +5,7 @@ let navigateRef = null;
 const axiosInstance = axios.create({
   baseURL: process.env.REACT_APP_API_BASE_URL,
   withCredentials: true,
-  timeout: 120000, // ⏱️ Add this line
+  timeout: 300000, // ⏱️ Set to 5 minutes (in milliseconds)
 });
  
 // ✅ Set navigate for use in interceptors

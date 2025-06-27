@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import axiosInstance from "../api/axiosInstance";
 import { Download, Send, User, Bot, MessageSquare } from "lucide-react";
-import { FaDownload } from "react-icons/fa";
+import { FaDownload, FaFileUpload } from "react-icons/fa";
+import { Plus } from "lucide-react";
 import { Autocomplete, TextField } from '@mui/material';
 
 const TestPlanGeneration = () => {
@@ -18,6 +19,9 @@ const TestPlanGeneration = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [downloadReady, setDownloadReady] = useState(false);
   const chatContainerRef = useRef(null);
+  const [showUploadMenu, setShowUploadMenu] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef(null);
 
   const inferTestType = (filename) => {
     const lower = filename.toLowerCase();
@@ -149,6 +153,39 @@ const TestPlanGeneration = () => {
     item.filename.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const handleUploadClick = () => {
+    setShowUploadMenu((prev) => !prev);
+  };
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (!file.name.endsWith('.jmx')) {
+      alert('Only .jmx files are allowed');
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      return;
+    }
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await axiosInstance.post("/upload-jmx", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      if (res.data.status === "success") {
+        fetchHistory();
+        setShowUploadMenu(false);
+      } else {
+        alert(res.data.message || "Upload failed");
+      }
+    } catch (err) {
+      alert("Upload error");
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
   return (
     <div className="tp-root enhanced-bg">
       <div className="tp-main" style={{ position: 'relative', zIndex: 1 }}>
@@ -188,25 +225,99 @@ const TestPlanGeneration = () => {
 
             <hr className="tp-section-divider" />
 
-            <div className="tp-chat-input-row">
-              <textarea
-                className={`tp-chat-input`}
-                placeholder={
-                  isLoading
-                    ? "Generating response..."
-                    : "Type your message here..."
-                }
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && !e.shiftKey && !isLoading) {
-                    e.preventDefault();
-                    handleSend();
+            <div className="tp-chat-input-row" style={{ position: 'relative', alignItems: 'center', display: 'flex' }}>
+              {/* Plus Icon inside chat input */}
+              <div style={{ position: 'relative', flex: 1, display: 'flex', alignItems: 'center' }}>
+                <Plus
+                  color="var(--tp-orange)"
+                  size={22}
+                  style={{
+                    position: 'absolute',
+                    left: 16,
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    cursor: 'pointer',
+                    zIndex: 2,
+                  }}
+                  onClick={handleUploadClick}
+                />
+                {/* Chat input with left padding for icon */}
+                <textarea
+                  className={`tp-chat-input`}
+                  style={{ paddingLeft: 44 }}
+                  placeholder={
+                    isLoading
+                      ? "Generating response..."
+                      : "Type your message here..."
                   }
-                }}
-                disabled={isLoading}
-                rows={1}
-              />
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.shiftKey && !isLoading) {
+                      e.preventDefault();
+                      handleSend();
+                    }
+                  }}
+                  disabled={isLoading}
+                  rows={1}
+                />
+                {/* Drop-up menu */}
+                {showUploadMenu && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      bottom: '110%',
+                      left: 0,
+                      background: '#fff',
+                      border: '1.5px solid var(--tp-orange)',
+                      borderRadius: '12px',
+                      boxShadow: '0 8px 24px rgba(255,122,0,0.13)',
+                      padding: '12px 18px',
+                      minWidth: 180,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'flex-start',
+                      zIndex: 100,
+                      animation: 'fadeInUp 0.25s',
+                    }}
+                    onMouseLeave={() => setShowUploadMenu(false)}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current && fileInputRef.current.click()}
+                      style={{
+                        background: uploading ? '#ccc' : 'var(--tp-orange)',
+                        color: '#fff',
+                        border: 'none',
+                        borderRadius: '8px',
+                        padding: '10px 18px',
+                        fontWeight: 600,
+                        fontSize: 15,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 8,
+                        cursor: uploading ? 'not-allowed' : 'pointer',
+                        boxShadow: uploading ? 'none' : '0 2px 8px rgba(255,122,0,0.13)',
+                        transition: 'all 0.2s',
+                        marginBottom: 2,
+                        width: '100%',
+                      }}
+                      disabled={uploading}
+                    >
+                      <FaFileUpload style={{ fontSize: 18 }} />
+                      {uploading ? 'Uploading...' : 'Upload JMX file'}
+                    </button>
+                    <input
+                      type="file"
+                      accept=".jmx"
+                      ref={fileInputRef}
+                      style={{ display: 'none' }}
+                      onChange={handleFileChange}
+                    />
+                  </div>
+                )}
+              </div>
+              {/* Chat buttons */}
               <div className="tp-button-group">
                 <button
                   className={`tp-btn-primary`}
