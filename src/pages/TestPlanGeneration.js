@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import axiosInstance from "../api/axiosInstance";
 import { Download, Send, User, Bot, MessageSquare } from "lucide-react";
-import { FaDownload, FaFileUpload } from "react-icons/fa";
+import { FaDownload, FaFileUpload, FaTimes } from "react-icons/fa";
 import { Plus } from "lucide-react";
 import { Autocomplete, TextField } from '@mui/material';
 
@@ -22,6 +22,7 @@ const TestPlanGeneration = () => {
   const [showUploadMenu, setShowUploadMenu] = useState(false);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef(null);
+  const [attachedFiles, setAttachedFiles] = useState([]);
 
   const inferTestType = (filename) => {
     const lower = filename.toLowerCase();
@@ -37,22 +38,57 @@ const TestPlanGeneration = () => {
   }, [chat]);
 
   const handleSend = async () => {
-    if (!message.trim()) return;
-
-    const currentMessage = message;
-    setChat((prev) => [...prev, { type: "user", text: currentMessage }]);
-    setMessage(""); // Clear input immediately
+    if (!message.trim() && attachedFiles.length === 0) return;
     setIsLoading(true);
     setDownloadReady(false);
 
+    // Send files if any
+    if (attachedFiles.length > 0) {
+      for (const file of attachedFiles) {
+        try {
+          const formData = new FormData();
+          formData.append("file", file);
+          const res = await axiosInstance.post("/upload-jmx", formData, {
+            headers: { "Content-Type": "multipart/form-data" },
+          });
+          if (res.data.status === "success") {
+            setChat((prev) => [
+              ...prev,
+              { type: "user", text: `JMX file sent: ${file.name}` },
+              { type: "bot", text: `JMX file ${file.name} uploaded successfully!` }
+            ]);
+            fetchHistory();
+          } else {
+            setChat((prev) => [
+              ...prev,
+              { type: "user", text: `JMX file sent: ${file.name}` },
+              { type: "bot", text: res.data.message || "Failed to upload JMX file." }
+            ]);
+          }
+        } catch (error) {
+          setChat((prev) => [
+            ...prev,
+            { type: "user", text: `JMX file sent: ${file.name}` },
+            { type: "bot", text: `Error uploading JMX file: ${error.response?.data?.message || error.message}` }
+          ]);
+        }
+      }
+      setAttachedFiles([]);
+      setMessage("");
+      setIsLoading(false);
+      return;
+    }
+
+    // If only message, send as before
+    const currentMessage = message;
+    setChat((prev) => [...prev, { type: "user", text: currentMessage }]);
+    setMessage("");
     try {
       const response = await axiosInstance.post("/generate-test-plan", {
         prompt: currentMessage,
       });
-
       if (response.data.status === "success") {
         const filename = response.data.jmx_filename;
-
         setChat((prev) => [
           ...prev,
           {
@@ -62,14 +98,12 @@ const TestPlanGeneration = () => {
         ]);
         setJmxFilename(filename);
         setDownloadReady(true);
-
         const now = formatDateSafe(new Date());
         const testType = currentMessage.toLowerCase().includes("load test")
           ? "Load Test"
           : currentMessage.toLowerCase().includes("api")
-            ? "API"
-            : "Other";
-
+          ? "API"
+          : "Other";
         setHistory((prev) => [
           { filename, date: now, testType },
           ...prev,
@@ -88,8 +122,7 @@ const TestPlanGeneration = () => {
         ...prev,
         {
           type: "bot",
-          text: `Error generating test plan: ${error.response?.data?.message || error.message
-            }`,
+          text: `Error generating test plan: ${error.response?.data?.message || error.message}`,
         },
       ]);
     } finally {
@@ -157,7 +190,7 @@ const TestPlanGeneration = () => {
     setShowUploadMenu((prev) => !prev);
   };
 
-  const handleFileChange = async (e) => {
+  const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
     if (!file.name.endsWith('.jmx')) {
@@ -165,25 +198,23 @@ const TestPlanGeneration = () => {
       if (fileInputRef.current) fileInputRef.current.value = "";
       return;
     }
-    setUploading(true);
-    try {
-      const formData = new FormData();
-      formData.append("file", file);
-      const res = await axiosInstance.post("/upload-jmx", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-      if (res.data.status === "success") {
-        fetchHistory();
-        setShowUploadMenu(false);
-      } else {
-        alert(res.data.message || "Upload failed");
-      }
-    } catch (err) {
-      alert("Upload error");
-    } finally {
-      setUploading(false);
+    if (attachedFiles.length >= 2) {
+      alert('You can attach a maximum of 2 files.');
       if (fileInputRef.current) fileInputRef.current.value = "";
+      return;
     }
+    if (attachedFiles.some(f => f.name === file.name)) {
+      alert('This file is already attached.');
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      return;
+    }
+    setAttachedFiles(prev => [...prev, file]);
+    setShowUploadMenu(false);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const handleRemoveFile = (name) => {
+    setAttachedFiles(prev => prev.filter(f => f.name !== name));
   };
 
   return (
@@ -204,7 +235,7 @@ const TestPlanGeneration = () => {
           <div className="tp-panel tp-panel-chat card-transition">
             <div className="tp-panel-title flex items-center gap-2">
               <MessageSquare size={18} />
-              KickLoad Test Generator
+               KickLoad Test Generator
             </div>
             <hr className="tp-section-divider" />
 
@@ -218,13 +249,73 @@ const TestPlanGeneration = () => {
                     {msg.type === "user" ? <User size={16} /> : <Bot size={16} />}
                     {msg.type === "user" ? "You" : "Assistant"}
                   </div>
-                  <div className="tp-chat-bubble-content">{msg.text}</div>
+                  <div className="tp-chat-bubble-content">
+                    {msg.file ? (
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 2 }}>
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          background: 'rgba(255,122,0,0.08)',
+                          color: 'var(--tp-orange)',
+                          borderRadius: 6,
+                          padding: '4px 12px',
+                          fontSize: 15,
+                          fontWeight: 600,
+                          border: '1px solid var(--tp-orange)',
+                          marginBottom: 2,
+                          gap: 8,
+                        }}>
+                          <FaFileUpload style={{ fontSize: 18, marginRight: 6 }} />
+                          {msg.file.length > 22 ? msg.file.slice(0, 18) + '...' : msg.file}
+                        </div>
+                        <span style={{ color: '#888', fontSize: 13, marginLeft: 2 }}>attached</span>
+                      </div>
+                    ) : (
+                      msg.text
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
 
             <hr className="tp-section-divider" />
 
+            {/* Show file chips above the chat input if files are attached */}
+            {attachedFiles.length > 0 && (
+              <div style={{
+                display: 'flex',
+                gap: 8,
+                marginBottom: 8,
+                marginLeft: 44,
+                maxWidth: 420,
+                flexWrap: 'wrap',
+              }}>
+                {attachedFiles.map((file) => (
+                  <div key={file.name} style={{
+                    background: 'rgba(255,122,0,0.08)',
+                    color: 'var(--tp-orange)',
+                    borderRadius: 6,
+                    padding: '2px 8px',
+                    fontSize: 13,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 4,
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    border: '1px solid var(--tp-orange)',
+                  }}>
+                    <FaFileUpload style={{ fontSize: 15, marginRight: 2 }} />
+                    {file.name.length > 18 ? file.name.slice(0, 15) + '...' : file.name}
+                    <FaTimes
+                      style={{ cursor: 'pointer', marginLeft: 4, fontSize: 13 }}
+                      onClick={() => handleRemoveFile(file.name)}
+                      title="Remove file"
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
             <div className="tp-chat-input-row" style={{ position: 'relative', alignItems: 'center', display: 'flex' }}>
               {/* Plus Icon inside chat input */}
               <div style={{ position: 'relative', flex: 1, display: 'flex', alignItems: 'center' }}>
@@ -236,20 +327,17 @@ const TestPlanGeneration = () => {
                     left: 16,
                     top: '50%',
                     transform: 'translateY(-50%)',
-                    cursor: 'pointer',
+                    cursor: attachedFiles.length >= 2 ? 'not-allowed' : 'pointer',
                     zIndex: 2,
+                    opacity: attachedFiles.length >= 2 ? 0.4 : 1,
                   }}
-                  onClick={handleUploadClick}
+                  onClick={attachedFiles.length >= 2 ? undefined : handleUploadClick}
                 />
                 {/* Chat input with left padding for icon */}
                 <textarea
                   className={`tp-chat-input`}
                   style={{ paddingLeft: 44 }}
-                  placeholder={
-                    isLoading
-                      ? "Generating response..."
-                      : "Type your message here..."
-                  }
+                  placeholder={isLoading ? "Generating response..." : "Type your message here..."}
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   onKeyDown={(e) => {
