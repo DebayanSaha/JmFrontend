@@ -915,6 +915,7 @@ const RunTestPage = () => {
         <div className="tp-panels route-transition" style={{
           display: 'flex',
           gap: '24px',
+          paddingLeft: '20px',
           paddingRight: '70px',
           justifyContent: 'center',
           alignItems: 'flex-start',
