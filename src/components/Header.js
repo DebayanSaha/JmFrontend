@@ -112,17 +112,22 @@ const Header = ({ licenseStatus, isMobile, sidebarOpen, setSidebarOpen, dropdown
         </button>
       )}
       <div
-        style={{
-          fontSize: "clamp(1.2rem, 4vw, 2.2rem)",
-          fontWeight: "bold",
-          background: "linear-gradient(135deg, #667eea, #764ba2)",
-          WebkitBackgroundClip: "text",
-          WebkitTextFillColor: "transparent",
-          whiteSpace: 'normal',
-          overflowWrap: 'break-word',
-          maxWidth: isMobile ? '60vw' : 'unset',
-          minWidth: 0,
-        }}
+       style={{
+        fontFamily: "Poppins, sans-serif",
+        fontSize: "clamp(1.2rem, 4vw, 2.2rem)",
+        fontWeight: "bold",
+        background: "linear-gradient(270deg,rgb(212, 74, 0),rgb(47, 36, 72),rgb(255, 255, 255))",
+        backgroundSize: "600% 600%",
+        WebkitBackgroundClip: "text",
+        WebkitTextFillColor: "transparent",
+        animation: "gradientSlide 8s ease infinite",
+        whiteSpace: 'normal',
+        overflowWrap: 'break-word',
+        maxWidth: isMobile ? '60vw' : 'unset',
+        minWidth: 0,
+      }}
+      
+       
       >
         KickLoad
       </div>
