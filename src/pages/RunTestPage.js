@@ -522,60 +522,131 @@ const RunTestPage = () => {
     };
 
     fetchParams();
-  }, [selectedFilename]);
-
+  }, [selectedFilename]); 
+ 
   const handleRunTest = async () => {
-    if (!selectedFilename) {
-      alert("Please select a JMX file to run the test");
+
+  if (!selectedFilename) {
+
+    alert("Please select a JMX file to run the test");
+
+    return;
+
+  }
+ 
+  setSummaryOutput("");
+
+  setIsLoading(true);
+
+  setStatusMessage(<span><FaClock /> Running test...</span>);
+
+  setResultFile(null);
+
+  setIsResultReady(false);
+ 
+  try {
+
+    // 1. Start test and get task_id
+
+    const res = await axiosInstance.post(
+
+      `/run-test/${encodeURIComponent(selectedFilename)}`,
+
+      editedParams || {},
+
+      { headers: { "Content-Type": "application/json" } }
+
+    );
+ 
+    const { status, task_id, message } = res.data;
+ 
+    if (status !== "started" || !task_id) {
+
+      setStatusMessage(<span><FaTimesCircle color="red" /> Failed to start test.</span>);
+
       return;
+
     }
+ 
+    setStatusMessage(<span><FaClock /> {message}</span>);
+ 
+    // 2. Poll task status every 3s
 
-    setSummaryOutput("");
-    setIsLoading(true);
-    setStatusMessage(<span><FaClock /> Running test...</span>);
-    setResultFile(null);
-    setIsResultReady(false);
+    const interval = setInterval(async () => {
 
-    try {
-      const res = await axiosInstance.post(
-        `/run-test/${encodeURIComponent(selectedFilename)}`,
-        editedParams || {},
-        { headers: { "Content-Type": "application/json" } }
-      );
+      try {
 
-      const data = res.data;
-      if (data.status === "success" || data.message?.includes("started in background")) {
-        setStatusMessage(<span><FaCheckCircle color="green" /> {data.message}</span>);
-        const filename = data.result_file;
-        setResultFile(filename);
-        setSummaryOutput(data.summary_output);
+        const statusRes = await axiosInstance.get(`/task-status/${task_id}`);
 
-        const interval = setInterval(async () => {
-          try {
-            await axiosInstance.head(`/download/${filename}`);
-            clearInterval(interval);
-            setIsResultReady(true);
-            setStatusMessage(<span><FaCheckCircle color="green" /> Test completed. Result is ready to download.</span>);
+        const taskStatus = statusRes.data;
+ 
+        if (taskStatus.status === "success") {
 
-            const now = formatDateSafe(new Date());
-            const newEntry = { filename, date: now };
-            setHistory((prev) => {
-              const updated = [newEntry, ...prev.filter((item) => item.filename !== filename)];
-              localStorage.setItem("runTestHistory", JSON.stringify(updated));
-              return updated;
-            });
-          } catch { }
-        }, 3000);
-      } else {
-        setStatusMessage(<span><FaTimesCircle color="red" /> Error: {data.message}</span>);
+          clearInterval(interval);
+ 
+          const filename = taskStatus.result_file;
+
+          const summary = taskStatus.summary_output;
+ 
+          setResultFile(filename);
+
+          setSummaryOutput(summary);
+
+          setIsResultReady(true);
+
+          setStatusMessage(<span><FaCheckCircle color="green" /> Test completed successfully.</span>);
+ 
+          const now = formatDateSafe(new Date());
+
+          const newEntry = { filename, date: now };
+ 
+          setHistory((prev) => {
+
+            const updated = [newEntry, ...prev.filter((item) => item.filename !== filename)];
+
+            localStorage.setItem("runTestHistory", JSON.stringify(updated));
+
+            return updated;
+
+          });
+ 
+        } else if (taskStatus.status === "error") {
+
+          clearInterval(interval);
+
+          setStatusMessage(<span><FaTimesCircle color="red" /> Error: {taskStatus.message}</span>);
+
+        }
+ 
+        // If still "pending" or "running", do nothing
+
+      } catch (err) {
+
+        console.error("Polling error:", err);
+
+        clearInterval(interval);
+
+        setStatusMessage(<span><FaTimesCircle color="red" /> Polling failed: {err.message}</span>);
+
       }
-    } catch (err) {
-      console.error("Run error:", err);
-      setStatusMessage(<span><FaTimesCircle color="red" /> Network Error: {err.message}</span>);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+
+    }, 3000); // every 3 seconds
+ 
+  } catch (err) {
+
+    console.error("Run error:", err);
+
+    setStatusMessage(<span><FaTimesCircle color="red" /> Network Error: {err.message}</span>);
+
+  } finally {
+
+    setIsLoading(false);
+
+  }
+
+};
+
+ 
 
   const handleDownload = async (filename) => {
     try {
@@ -844,6 +915,7 @@ const RunTestPage = () => {
         <div className="tp-panels route-transition" style={{
           display: 'flex',
           gap: '24px',
+          paddingRight: '70px',
           justifyContent: 'center',
           alignItems: 'flex-start',
           width: '100%',
