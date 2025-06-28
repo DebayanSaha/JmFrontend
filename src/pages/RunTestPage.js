@@ -69,15 +69,15 @@ function formatDateSafe(dateString) {
 // Utility to parse summary output and format as table data
 function parseSummaryOutput(summaryText) {
   if (!summaryText) return [];
-  
+
   const lines = summaryText.split('\n');
   const summaryData = [];
-  
+
   lines.forEach(line => {
     if (line.trim().startsWith('summary')) {
       // Parse summary line: summary + 1 in 00:00:02 = 0.5/s Avg: 62 Min: 62 Max: 62 Err: 1 (100.00%) Active: 20 Started: 20 Finished: 0
       const match = line.match(/summary\s*([+=])\s*(\d+)\s+in\s+(\d{2}:\d{2}:\d{2})\s*=\s*([\d.]+)\/s\s+Avg:\s*(\d+)\s+Min:\s*(\d+)\s+Max:\s*(\d+)\s+Err:\s*(\d+)\s*\(([\d.]+)%\)\s*(?:Active:\s*(\d+)\s+Started:\s*(\d+)\s+Finished:\s*(\d+))?/);
-      
+
       if (match) {
         const requests = parseInt(match[2]);
         const errors = parseInt(match[8]);
@@ -85,12 +85,12 @@ function parseSummaryOutput(summaryText) {
         const avgResponse = parseInt(match[5]);
         const minResponse = parseInt(match[6]);
         const maxResponse = parseInt(match[7]);
-        
+
         // Calculate additional metrics
         const successRate = 100 - errorRate;
         const responseTimeRange = maxResponse - minResponse;
         const throughput = parseFloat(match[4]);
-        
+
         // Determine performance status
         let performanceStatus = 'Good';
         let statusColor = '#4CAF50';
@@ -104,7 +104,7 @@ function parseSummaryOutput(summaryText) {
           performanceStatus = 'Slow';
           statusColor = '#FFC107';
         }
-        
+
         summaryData.push({
           type: match[1] === '+' ? 'Increment' : match[1] === '=' ? 'Total' : 'Summary',
           requests: requests,
@@ -126,7 +126,7 @@ function parseSummaryOutput(summaryText) {
       }
     }
   });
-  
+
   return summaryData;
 }
 
@@ -259,9 +259,9 @@ const TestResultsCharts = ({ summaryData }) => {
       <Typography variant="h6" style={{ marginBottom: '16px', color: '#FF6D00', display: 'flex', alignItems: 'center', gap: '8px' }}>
         <FaChartPie /> Performance Analytics Dashboard
       </Typography>
-      
-      <Tabs 
-        value={activeTab} 
+
+      <Tabs
+        value={activeTab}
         onChange={(e, newValue) => setActiveTab(newValue)}
         sx={{
           '& .MuiTab-root': {
@@ -295,8 +295,8 @@ const TestResultsCharts = ({ summaryData }) => {
                   Success vs Error Rate
                 </Typography>
                 <div style={{ height: '300px', position: 'relative' }}>
-                  <Doughnut 
-                    data={successErrorData} 
+                  <Doughnut
+                    data={successErrorData}
                     options={{
                       ...chartOptions,
                       plugins: {
@@ -329,7 +329,7 @@ const TestResultsCharts = ({ summaryData }) => {
               Response Time Analysis
             </Typography>
             <div style={{ height: '400px', position: 'relative' }}>
-              <Line 
+              <Line
                 data={{
                   labels: incrementRows.map((_, index) => `Phase ${index + 1}`),
                   datasets: [
@@ -361,8 +361,8 @@ const TestResultsCharts = ({ summaryData }) => {
                       tension: 0.4,
                     }
                   ]
-                }} 
-                options={lineChartOptions} 
+                }}
+                options={lineChartOptions}
               />
             </div>
           </Paper>
@@ -397,7 +397,7 @@ const TestResultsCharts = ({ summaryData }) => {
                   Error Rate Trend
                 </Typography>
                 <div style={{ height: '300px', position: 'relative' }}>
-                  <Line 
+                  <Line
                     data={{
                       labels: incrementRows.map((_, index) => `Phase ${index + 1}`),
                       datasets: [{
@@ -409,8 +409,8 @@ const TestResultsCharts = ({ summaryData }) => {
                         fill: true,
                         tension: 0.4,
                       }]
-                    }} 
-                    options={lineChartOptions} 
+                    }}
+                    options={lineChartOptions}
                   />
                 </div>
               </Paper>
@@ -424,8 +424,8 @@ const TestResultsCharts = ({ summaryData }) => {
               Overall Performance Metrics
             </Typography>
             <div style={{ height: '400px', position: 'relative' }}>
-              <Line 
-                data={performanceMetrics} 
+              <Line
+                data={performanceMetrics}
                 options={{
                   ...chartOptions,
                   scales: {
@@ -443,7 +443,7 @@ const TestResultsCharts = ({ summaryData }) => {
                       }
                     }
                   }
-                }} 
+                }}
               />
             </div>
           </Paper>
@@ -463,6 +463,11 @@ const RunTestPage = () => {
   const [history, setHistory] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [summaryOutput, setSummaryOutput] = useState("");
+
+  const [jmxParams, setJmxParams] = useState(null); // extracted params
+  const [editedParams, setEditedParams] = useState(null); // user input
+  const [isParamsLoading, setIsParamsLoading] = useState(false);
+
 
   useEffect(() => {
     const fetchJMXFiles = async () => {
@@ -491,6 +496,34 @@ const RunTestPage = () => {
     fetchJTLHistory();
   }, []);
 
+  useEffect(() => {
+    const fetchParams = async () => {
+      if (!selectedFilename) {
+        setJmxParams(null);
+        return;
+      }
+
+      try {
+        setIsParamsLoading(true);
+        const res = await axiosInstance.get(`/extract-params?file=${encodeURIComponent(selectedFilename)}`);
+        const data = res.data?.params;
+        setJmxParams(data || null);
+        setEditedParams({
+          num_threads: data?.thread_groups?.[0]?.num_threads || "",
+          ramp_time: data?.thread_groups?.[0]?.ramp_time || "",
+          loop_count: data?.thread_groups?.[0]?.loop_count || ""
+        });
+      } catch (error) {
+        console.error("Failed to extract JMX params:", error);
+        setJmxParams(null);
+      } finally {
+        setIsParamsLoading(false);
+      }
+    };
+
+    fetchParams();
+  }, [selectedFilename]);
+
   const handleRunTest = async () => {
     if (!selectedFilename) {
       alert("Please select a JMX file to run the test");
@@ -499,31 +532,20 @@ const RunTestPage = () => {
 
     setSummaryOutput("");
     setIsLoading(true);
-    setStatusMessage(
-      <span>
-        <FaClock /> Running test...
-      </span>
-    );
+    setStatusMessage(<span><FaClock /> Running test...</span>);
     setResultFile(null);
     setIsResultReady(false);
 
     try {
       const res = await axiosInstance.post(
         `/run-test/${encodeURIComponent(selectedFilename)}`,
-        {},
-        { headers: { "Content-Type": "multipart/form-data" } }
+        editedParams || {},
+        { headers: { "Content-Type": "application/json" } }
       );
 
       const data = res.data;
-      if (
-        data.status === "success" ||
-        data.message?.includes("started in background")
-      ) {
-        setStatusMessage(
-          <span>
-            <FaCheckCircle color="green" /> {data.message}
-          </span>
-        );
+      if (data.status === "success" || data.message?.includes("started in background")) {
+        setStatusMessage(<span><FaCheckCircle color="green" /> {data.message}</span>);
         const filename = data.result_file;
         setResultFile(filename);
         setSummaryOutput(data.summary_output);
@@ -533,44 +555,23 @@ const RunTestPage = () => {
             await axiosInstance.head(`/download/${filename}`);
             clearInterval(interval);
             setIsResultReady(true);
-            setStatusMessage(
-              <span>
-                <FaCheckCircle color="green" /> Test completed. Result is ready to download.
-              </span>
-            );
+            setStatusMessage(<span><FaCheckCircle color="green" /> Test completed. Result is ready to download.</span>);
 
             const now = formatDateSafe(new Date());
-            const newEntry = {
-              filename,
-              date: now,
-            };
-
+            const newEntry = { filename, date: now };
             setHistory((prev) => {
-              const updated = [
-                newEntry,
-                ...prev.filter((item) => item.filename !== filename),
-              ];
+              const updated = [newEntry, ...prev.filter((item) => item.filename !== filename)];
               localStorage.setItem("runTestHistory", JSON.stringify(updated));
               return updated;
             });
-          } catch {
-            // Polling continues until file exists
-          }
+          } catch { }
         }, 3000);
       } else {
-        setStatusMessage(
-          <span>
-            <FaTimesCircle color="red" /> Error: {data.message}
-          </span>
-        );
+        setStatusMessage(<span><FaTimesCircle color="red" /> Error: {data.message}</span>);
       }
     } catch (err) {
       console.error("Run error:", err);
-      setStatusMessage(
-        <span>
-          <FaTimesCircle color="red" /> Network Error: {err.message}
-        </span>
-      );
+      setStatusMessage(<span><FaTimesCircle color="red" /> Network Error: {err.message}</span>);
     } finally {
       setIsLoading(false);
     }
@@ -935,6 +936,44 @@ const RunTestPage = () => {
               />
             </div>
 
+            {jmxParams && (
+              <div style={{ marginBottom: '24px', width: '100%' }}>
+                <Typography variant="subtitle1" style={{ fontWeight: 600, color: '#FF6D00', marginBottom: '8px' }}>
+                  Configure Test Parameters
+                </Typography>
+                <Grid container spacing={2}>
+                  <Grid item xs={12} sm={4}>
+                    <TextField
+                      label="Number of Users"
+                      type="number"
+                      fullWidth
+                      value={editedParams?.num_threads || ""}
+                      onChange={(e) => setEditedParams({ ...editedParams, num_threads: e.target.value })}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={4}>
+                    <TextField
+                      label="Ramp-Up Time (s)"
+                      type="number"
+                      fullWidth
+                      value={editedParams?.ramp_time || ""}
+                      onChange={(e) => setEditedParams({ ...editedParams, ramp_time: e.target.value })}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={4}>
+                    <TextField
+                      label="Loop Count"
+                      type="number"
+                      fullWidth
+                      value={editedParams?.loop_count || ""}
+                      onChange={(e) => setEditedParams({ ...editedParams, loop_count: e.target.value })}
+                    />
+                  </Grid>
+                </Grid>
+              </div>
+            )}
+
+
             <div style={{
               display: 'flex',
               gap: '16px',
@@ -1041,14 +1080,14 @@ const RunTestPage = () => {
                   Test Summary
                 </Typography>
                 {(parseSummaryOutput(summaryOutput).length > 0) ? (
-                  <div style={{overflowX: 'auto'}}>
+                  <div style={{ overflowX: 'auto' }}>
                     <table style={{ width: '100%', borderCollapse: 'collapse', fontFamily: 'inherit', fontSize: 14 }}>
                       <thead>
                         <tr style={{ background: 'linear-gradient(135deg, #FF6D00, #FF8A3D)', color: 'white' }}>
                           <th style={{ padding: '8px 6px', border: '1px solid #E0E0E0', textAlign: 'center' }}>Type</th>
                           <th style={{ padding: '8px 6px', border: '1px solid #E0E0E0', textAlign: 'center' }}>Requests</th>
                           <th style={{ padding: '8px 6px', border: '1px solid #E0E0E0', textAlign: 'center' }}>Duration</th>
-                          <th style={{ padding: '8px 6px', border: '1px solid #E0E0E0', textAlign: 'center' }}>Throughput<br/>(req/s)</th>
+                          <th style={{ padding: '8px 6px', border: '1px solid #E0E0E0', textAlign: 'center' }}>Throughput<br />(req/s)</th>
                           <th style={{ padding: '8px 6px', border: '1px solid #E0E0E0', textAlign: 'center' }}>Response Time (ms)</th>
                           <th style={{ padding: '8px 6px', border: '1px solid #E0E0E0', textAlign: 'center' }}>Success Rate</th>
                           <th style={{ padding: '8px 6px', border: '1px solid #E0E0E0', textAlign: 'center' }}>Performance</th>
@@ -1067,63 +1106,63 @@ const RunTestPage = () => {
                       </thead>
                       <tbody>
                         {parseSummaryOutput(summaryOutput).map((row, idx) => (
-                          <tr key={idx} style={{ 
+                          <tr key={idx} style={{
                             background: idx % 2 === 0 ? '#FFF8F1' : '#FFFFFF',
                             transition: 'all 0.2s ease'
                           }}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.background = '#FFE0B2';
-                            e.currentTarget.style.transform = 'scale(1.01)';
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.background = idx % 2 === 0 ? '#FFF8F1' : '#FFFFFF';
-                            e.currentTarget.style.transform = 'scale(1)';
-                          }}>
-                            <td style={{ 
-                              padding: '8px 6px', 
-                              border: '1px solid #E0E0E0', 
-                              fontWeight: 600, 
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.background = '#FFE0B2';
+                              e.currentTarget.style.transform = 'scale(1.01)';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.background = idx % 2 === 0 ? '#FFF8F1' : '#FFFFFF';
+                              e.currentTarget.style.transform = 'scale(1)';
+                            }}>
+                            <td style={{
+                              padding: '8px 6px',
+                              border: '1px solid #E0E0E0',
+                              fontWeight: 600,
                               textAlign: 'center',
                               background: row.type === 'Total' ? '#FFE0B2' : 'transparent'
                             }}>
                               {row.type}
                             </td>
-                            <td style={{ 
-                              padding: '8px 6px', 
-                              border: '1px solid #E0E0E0', 
+                            <td style={{
+                              padding: '8px 6px',
+                              border: '1px solid #E0E0E0',
                               textAlign: 'center',
                               fontWeight: 600,
                               color: row.type === 'Total' ? '#FF6D00' : '#333'
                             }}>
                               {row.requests.toLocaleString()}
                             </td>
-                            <td style={{ 
-                              padding: '8px 6px', 
-                              border: '1px solid #E0E0E0', 
+                            <td style={{
+                              padding: '8px 6px',
+                              border: '1px solid #E0E0E0',
                               textAlign: 'center',
                               fontFamily: 'monospace',
                               fontSize: 13
                             }}>
                               {row.duration}
                             </td>
-                            <td style={{ 
-                              padding: '8px 6px', 
-                              border: '1px solid #E0E0E0', 
+                            <td style={{
+                              padding: '8px 6px',
+                              border: '1px solid #E0E0E0',
                               textAlign: 'center',
                               fontWeight: 600,
                               color: row.rate > 100 ? '#4CAF50' : row.rate > 50 ? '#FF9800' : '#F44336'
                             }}>
                               {row.rate.toFixed(1)}
                             </td>
-                            <td style={{ 
-                              padding: '8px 6px', 
-                              border: '1px solid #E0E0E0', 
+                            <td style={{
+                              padding: '8px 6px',
+                              border: '1px solid #E0E0E0',
                               textAlign: 'center',
                               fontFamily: 'monospace',
                               fontSize: 12
                             }}>
                               <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                                <span style={{ 
+                                <span style={{
                                   color: row.avgResponse > 1000 ? '#F44336' : row.avgResponse > 500 ? '#FF9800' : '#4CAF50',
                                   fontWeight: 600
                                 }}>
@@ -1137,13 +1176,13 @@ const RunTestPage = () => {
                                 </span>
                               </div>
                             </td>
-                            <td style={{ 
-                              padding: '8px 6px', 
-                              border: '1px solid #E0E0E0', 
+                            <td style={{
+                              padding: '8px 6px',
+                              border: '1px solid #E0E0E0',
                               textAlign: 'center'
                             }}>
                               <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                                <span style={{ 
+                                <span style={{
                                   color: row.successRate > 95 ? '#4CAF50' : row.successRate > 80 ? '#FF9800' : '#F44336',
                                   fontWeight: 600
                                 }}>
@@ -1154,9 +1193,9 @@ const RunTestPage = () => {
                                 </span>
                               </div>
                             </td>
-                            <td style={{ 
-                              padding: '8px 6px', 
-                              border: '1px solid #E0E0E0', 
+                            <td style={{
+                              padding: '8px 6px',
+                              border: '1px solid #E0E0E0',
                               textAlign: 'center'
                             }}>
                               <span style={{
@@ -1172,9 +1211,9 @@ const RunTestPage = () => {
                                 {row.performanceStatus}
                               </span>
                             </td>
-                            <td style={{ 
-                              padding: '8px 6px', 
-                              border: '1px solid #E0E0E0', 
+                            <td style={{
+                              padding: '8px 6px',
+                              border: '1px solid #E0E0E0',
                               textAlign: 'center',
                               fontFamily: 'monospace',
                               fontSize: 12
@@ -1196,7 +1235,7 @@ const RunTestPage = () => {
                         ))}
                       </tbody>
                     </table>
-                    
+
                     {/* Summary Statistics */}
                     <div style={{
                       marginTop: '16px',
@@ -1205,24 +1244,24 @@ const RunTestPage = () => {
                       borderRadius: '8px',
                       border: '1px solid #FFCC80'
                     }}>
-                      <div style={{ 
-                        display: 'grid', 
-                        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
+                      <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
                         gap: '12px',
                         fontSize: 13
                       }}>
                         {(() => {
                           const totalRow = parseSummaryOutput(summaryOutput).find(row => row.type === 'Total');
                           const incrementRows = parseSummaryOutput(summaryOutput).filter(row => row.type === 'Increment');
-                          
+
                           if (totalRow) {
                             // Calculate additional metrics
-                            const avgThroughput = incrementRows.length > 0 
-                              ? incrementRows.reduce((sum, row) => sum + row.rate, 0) / incrementRows.length 
+                            const avgThroughput = incrementRows.length > 0
+                              ? incrementRows.reduce((sum, row) => sum + row.rate, 0) / incrementRows.length
                               : totalRow.rate;
-                            
+
                             const responseTimeStability = totalRow.responseTimeRange / totalRow.avgResponse * 100;
-                            
+
                             return (
                               <>
                                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -1231,8 +1270,8 @@ const RunTestPage = () => {
                                 </div>
                                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                                   <span style={{ fontWeight: 600, color: '#FF6D00' }}>Overall Success Rate:</span>
-                                  <span style={{ 
-                                    fontWeight: 600, 
+                                  <span style={{
+                                    fontWeight: 600,
                                     color: totalRow.successRate > 95 ? '#4CAF50' : totalRow.successRate > 80 ? '#FF9800' : '#F44336'
                                   }}>
                                     {totalRow.successRate.toFixed(1)}%
@@ -1240,7 +1279,7 @@ const RunTestPage = () => {
                                 </div>
                                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                                   <span style={{ fontWeight: 600, color: '#FF6D00' }}>Average Response Time:</span>
-                                  <span style={{ 
+                                  <span style={{
                                     fontWeight: 600,
                                     color: totalRow.avgResponse > 1000 ? '#F44336' : totalRow.avgResponse > 500 ? '#FF9800' : '#4CAF50'
                                   }}>
@@ -1257,7 +1296,7 @@ const RunTestPage = () => {
                                 </div>
                                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                                   <span style={{ fontWeight: 600, color: '#FF6D00' }}>Response Time Range:</span>
-                                  <span style={{ 
+                                  <span style={{
                                     fontWeight: 600,
                                     color: responseTimeStability > 200 ? '#F44336' : responseTimeStability > 100 ? '#FF9800' : '#4CAF50'
                                   }}>
@@ -1266,7 +1305,7 @@ const RunTestPage = () => {
                                 </div>
                                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                                   <span style={{ fontWeight: 600, color: '#FF6D00' }}>Total Errors:</span>
-                                  <span style={{ 
+                                  <span style={{
                                     fontWeight: 600,
                                     color: totalRow.errors > 0 ? '#F44336' : '#4CAF50'
                                   }}>
@@ -1283,13 +1322,13 @@ const RunTestPage = () => {
                           return null;
                         })()}
                       </div>
-                      
+
                       {/* Performance Insights */}
                       {(() => {
                         const totalRow = parseSummaryOutput(summaryOutput).find(row => row.type === 'Total');
                         if (totalRow) {
                           const insights = [];
-                          
+
                           if (totalRow.successRate < 95) {
                             insights.push('⚠️ High error rate detected - consider investigating server issues');
                           }
@@ -1305,7 +1344,7 @@ const RunTestPage = () => {
                           if (insights.length === 0) {
                             insights.push('✅ Good performance across all metrics');
                           }
-                          
+
                           return (
                             <div style={{
                               marginTop: '12px',
@@ -1332,7 +1371,7 @@ const RunTestPage = () => {
                 ) : (
                   <pre style={{ margin: 0 }}>{summaryOutput}</pre>
                 )}
-                
+
                 {/* Professional Charts and Analytics */}
                 {(parseSummaryOutput(summaryOutput).length > 0) && (
                   <TestResultsCharts summaryData={parseSummaryOutput(summaryOutput)} />
@@ -1424,14 +1463,14 @@ const RunTestPage = () => {
                     wordBreak: 'break-all',
                     overflowWrap: 'anywhere',
                   }}
-                  onMouseEnter={e => {
-                    e.currentTarget.style.boxShadow = '0 12px 32px rgba(255, 153, 102, 0.13)';
-                    e.currentTarget.style.transform = 'scale(1.01)';
-                  }}
-                  onMouseLeave={e => {
-                    e.currentTarget.style.boxShadow = 'none';
-                    e.currentTarget.style.transform = 'scale(1)';
-                  }}
+                    onMouseEnter={e => {
+                      e.currentTarget.style.boxShadow = '0 12px 32px rgba(255, 153, 102, 0.13)';
+                      e.currentTarget.style.transform = 'scale(1.01)';
+                    }}
+                    onMouseLeave={e => {
+                      e.currentTarget.style.boxShadow = 'none';
+                      e.currentTarget.style.transform = 'scale(1)';
+                    }}
                   >
                     <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
                       <div className="tp-history-filename" style={{ fontWeight: '600', fontSize: '15px', marginBottom: '4px', color: 'var(--tp-text)', display: 'flex', alignItems: 'center', gap: '6px' }}>
