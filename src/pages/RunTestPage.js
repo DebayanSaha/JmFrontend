@@ -46,19 +46,49 @@ function parseSummaryOutput(summaryText) {
       const match = line.match(/summary\s*([+=])\s*(\d+)\s+in\s+(\d{2}:\d{2}:\d{2})\s*=\s*([\d.]+)\/s\s+Avg:\s*(\d+)\s+Min:\s*(\d+)\s+Max:\s*(\d+)\s+Err:\s*(\d+)\s*\(([\d.]+)%\)\s*(?:Active:\s*(\d+)\s+Started:\s*(\d+)\s+Finished:\s*(\d+))?/);
       
       if (match) {
+        const requests = parseInt(match[2]);
+        const errors = parseInt(match[8]);
+        const errorRate = parseFloat(match[9]);
+        const avgResponse = parseInt(match[5]);
+        const minResponse = parseInt(match[6]);
+        const maxResponse = parseInt(match[7]);
+        
+        // Calculate additional metrics
+        const successRate = 100 - errorRate;
+        const responseTimeRange = maxResponse - minResponse;
+        const throughput = parseFloat(match[4]);
+        
+        // Determine performance status
+        let performanceStatus = 'Good';
+        let statusColor = '#4CAF50';
+        if (errorRate > 50) {
+          performanceStatus = 'Critical';
+          statusColor = '#F44336';
+        } else if (errorRate > 10) {
+          performanceStatus = 'Warning';
+          statusColor = '#FF9800';
+        } else if (avgResponse > 1000) {
+          performanceStatus = 'Slow';
+          statusColor = '#FFC107';
+        }
+        
         summaryData.push({
           type: match[1] === '+' ? 'Increment' : match[1] === '=' ? 'Total' : 'Summary',
-          requests: parseInt(match[2]),
+          requests: requests,
           duration: match[3],
-          rate: parseFloat(match[4]),
-          avgResponse: parseInt(match[5]),
-          minResponse: parseInt(match[6]),
-          maxResponse: parseInt(match[7]),
-          errors: parseInt(match[8]),
-          errorRate: parseFloat(match[9]),
+          rate: throughput,
+          avgResponse: avgResponse,
+          minResponse: minResponse,
+          maxResponse: maxResponse,
+          responseTimeRange: responseTimeRange,
+          errors: errors,
+          errorRate: errorRate,
+          successRate: successRate,
           active: match[10] ? parseInt(match[10]) : null,
           started: match[11] ? parseInt(match[11]) : null,
-          finished: match[12] ? parseInt(match[12]) : null
+          finished: match[12] ? parseInt(match[12]) : null,
+          performanceStatus: performanceStatus,
+          statusColor: statusColor
         });
       }
     }
@@ -82,10 +112,7 @@ const RunTestPage = () => {
     const fetchJMXFiles = async () => {
       try {
         const res = await axiosInstance.get("/list-files?type=jmx");
-
         setAvailableFiles((res.data || []).map(file => file.filename));
-
-
       } catch (err) {
         console.error("Failed to fetch .jmx files:", err);
       }
@@ -94,13 +121,11 @@ const RunTestPage = () => {
     const fetchJTLHistory = async () => {
       try {
         const res = await axiosInstance.get("/list-files?type=jtl");
-
         const parsedHistory = (res.data || []).map(file => ({
           filename: file.filename,
           date: formatDateSafe(file.datetime),
         }));
         setHistory(parsedHistory);
-
       } catch (err) {
         console.error("Error fetching JTL history:", err);
       }
@@ -117,7 +142,6 @@ const RunTestPage = () => {
     }
 
     setSummaryOutput("");
-
     setIsLoading(true);
     setStatusMessage(
       <span>
@@ -202,8 +226,6 @@ const RunTestPage = () => {
 
       if (res.data.status === "success" && res.data.download_url) {
         const url = res.data.download_url;
-
-        // Open in a new tab — this triggers the browser's native download behavior
         window.open(url, "_blank");
       } else {
         alert(res.data.message || "Failed to get download URL.");
@@ -213,7 +235,6 @@ const RunTestPage = () => {
       alert("Error downloading file.");
     }
   };
-
 
   const filteredHistory = history.filter((item) =>
     item.filename.toLowerCase().includes(searchQuery.toLowerCase())
@@ -232,7 +253,7 @@ const RunTestPage = () => {
         }
         .enhanced-bg {
           min-height: 100vh;
-         background: linear-gradient(to bottom, #FFE9D0, #FFF3E0);
+          background: linear-gradient(to bottom, #FFE9D0, #FFF3E0);
           font-family: var(--tp-font);
           color: var(--tp-text);
           display: flex;
@@ -257,7 +278,6 @@ const RunTestPage = () => {
           --tp-btn-shadow: 0px 4px 12px rgba(255, 122, 0, 0.3);
           --tp-font: 'Poppins', 'Inter', 'Segoe UI', Arial, sans-serif;
         }
-        /* Enhanced Responsive Breakpoints */
         @media (max-width: 1400px) {
           .tp-main {
             max-width: 95vw !important;
@@ -365,7 +385,6 @@ const RunTestPage = () => {
             padding: clamp(3px, 2vw, 6px) !important;
           }
         }
-        /* Unauthenticated user styling */
         .MuiButton-root.unauthenticated {
           opacity: 0.6 !important;
           cursor: not-allowed !important;
@@ -667,49 +686,298 @@ const RunTestPage = () => {
                 </Typography>
                 {(parseSummaryOutput(summaryOutput).length > 0) ? (
                   <div style={{overflowX: 'auto'}}>
-                    <table style={{ width: '100%', borderCollapse: 'collapse', fontFamily: 'inherit', fontSize: 15 }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', fontFamily: 'inherit', fontSize: 14 }}>
                       <thead>
-                        <tr style={{ background: '#FFE0B2', color: '#333' }}>
-                          <th style={{ padding: '6px 10px', border: '1px solid #E0E0E0' }}>Type</th>
-                          <th style={{ padding: '6px 10px', border: '1px solid #E0E0E0' }}>Requests</th>
-                          <th style={{ padding: '6px 10px', border: '1px solid #E0E0E0' }}>Duration</th>
-                          <th style={{ padding: '6px 10px', border: '1px solid #E0E0E0' }}>Rate (req/s)</th>
-                          <th style={{ padding: '6px 10px', border: '1px solid #E0E0E0' }}>Avg (ms)</th>
-                          <th style={{ padding: '6px 10px', border: '1px solid #E0E0E0' }}>Min (ms)</th>
-                          <th style={{ padding: '6px 10px', border: '1px solid #E0E0E0' }}>Max (ms)</th>
-                          <th style={{ padding: '6px 10px', border: '1px solid #E0E0E0' }}>Errors</th>
-                          <th style={{ padding: '6px 10px', border: '1px solid #E0E0E0' }}>Error %</th>
-                          <th style={{ padding: '6px 10px', border: '1px solid #E0E0E0' }}>Active</th>
-                          <th style={{ padding: '6px 10px', border: '1px solid #E0E0E0' }}>Started</th>
-                          <th style={{ padding: '6px 10px', border: '1px solid #E0E0E0' }}>Finished</th>
+                        <tr style={{ background: 'linear-gradient(135deg, #FF6D00, #FF8A3D)', color: 'white' }}>
+                          <th style={{ padding: '8px 6px', border: '1px solid #E0E0E0', textAlign: 'center' }}>Type</th>
+                          <th style={{ padding: '8px 6px', border: '1px solid #E0E0E0', textAlign: 'center' }}>Requests</th>
+                          <th style={{ padding: '8px 6px', border: '1px solid #E0E0E0', textAlign: 'center' }}>Duration</th>
+                          <th style={{ padding: '8px 6px', border: '1px solid #E0E0E0', textAlign: 'center' }}>Throughput<br/>(req/s)</th>
+                          <th style={{ padding: '8px 6px', border: '1px solid #E0E0E0', textAlign: 'center' }}>Response Time (ms)</th>
+                          <th style={{ padding: '8px 6px', border: '1px solid #E0E0E0', textAlign: 'center' }}>Success Rate</th>
+                          <th style={{ padding: '8px 6px', border: '1px solid #E0E0E0', textAlign: 'center' }}>Performance</th>
+                          <th style={{ padding: '8px 6px', border: '1px solid #E0E0E0', textAlign: 'center' }}>Thread Status</th>
+                        </tr>
+                        <tr style={{ background: '#FFF3E0', color: '#666', fontSize: 12 }}>
+                          <th style={{ padding: '4px 6px', border: '1px solid #E0E0E0', textAlign: 'center', fontWeight: 'normal' }}></th>
+                          <th style={{ padding: '4px 6px', border: '1px solid #E0E0E0', textAlign: 'center', fontWeight: 'normal' }}>Total</th>
+                          <th style={{ padding: '4px 6px', border: '1px solid #E0E0E0', textAlign: 'center', fontWeight: 'normal' }}>HH:MM:SS</th>
+                          <th style={{ padding: '4px 6px', border: '1px solid #E0E0E0', textAlign: 'center', fontWeight: 'normal' }}>Requests/sec</th>
+                          <th style={{ padding: '4px 6px', border: '1px solid #E0E0E0', textAlign: 'center', fontWeight: 'normal' }}>Avg | Min | Max</th>
+                          <th style={{ padding: '4px 6px', border: '1px solid #E0E0E0', textAlign: 'center', fontWeight: 'normal' }}>Success %</th>
+                          <th style={{ padding: '4px 6px', border: '1px solid #E0E0E0', textAlign: 'center', fontWeight: 'normal' }}>Status</th>
+                          <th style={{ padding: '4px 6px', border: '1px solid #E0E0E0', textAlign: 'center', fontWeight: 'normal' }}>Active | Started | Finished</th>
                         </tr>
                       </thead>
                       <tbody>
                         {parseSummaryOutput(summaryOutput).map((row, idx) => (
-                          <tr key={idx} style={{ background: idx % 2 === 0 ? '#FFF8F1' : '#FFFFFF' }}>
-                            <td style={{ padding: '6px 10px', border: '1px solid #E0E0E0', fontWeight: 600 }}>{row.type}</td>
-                            <td style={{ padding: '6px 10px', border: '1px solid #E0E0E0' }}>{row.requests}</td>
-                            <td style={{ padding: '6px 10px', border: '1px solid #E0E0E0' }}>{row.duration}</td>
-                            <td style={{ padding: '6px 10px', border: '1px solid #E0E0E0' }}>{row.rate}</td>
-                            <td style={{ padding: '6px 10px', border: '1px solid #E0E0E0' }}>{row.avgResponse}</td>
-                            <td style={{ padding: '6px 10px', border: '1px solid #E0E0E0' }}>{row.minResponse}</td>
-                            <td style={{ padding: '6px 10px', border: '1px solid #E0E0E0' }}>{row.maxResponse}</td>
-                            <td style={{ padding: '6px 10px', border: '1px solid #E0E0E0' }}>{row.errors}</td>
-                            <td style={{ padding: '6px 10px', border: '1px solid #E0E0E0' }}>{row.errorRate}%</td>
-                            <td style={{ padding: '6px 10px', border: '1px solid #E0E0E0' }}>{row.active !== null ? row.active : '-'}</td>
-                            <td style={{ padding: '6px 10px', border: '1px solid #E0E0E0' }}>{row.started !== null ? row.started : '-'}</td>
-                            <td style={{ padding: '6px 10px', border: '1px solid #E0E0E0' }}>{row.finished !== null ? row.finished : '-'}</td>
+                          <tr key={idx} style={{ 
+                            background: idx % 2 === 0 ? '#FFF8F1' : '#FFFFFF',
+                            transition: 'all 0.2s ease'
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.background = '#FFE0B2';
+                            e.currentTarget.style.transform = 'scale(1.01)';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.background = idx % 2 === 0 ? '#FFF8F1' : '#FFFFFF';
+                            e.currentTarget.style.transform = 'scale(1)';
+                          }}>
+                            <td style={{ 
+                              padding: '8px 6px', 
+                              border: '1px solid #E0E0E0', 
+                              fontWeight: 600, 
+                              textAlign: 'center',
+                              background: row.type === 'Total' ? '#FFE0B2' : 'transparent'
+                            }}>
+                              {row.type}
+                            </td>
+                            <td style={{ 
+                              padding: '8px 6px', 
+                              border: '1px solid #E0E0E0', 
+                              textAlign: 'center',
+                              fontWeight: 600,
+                              color: row.type === 'Total' ? '#FF6D00' : '#333'
+                            }}>
+                              {row.requests.toLocaleString()}
+                            </td>
+                            <td style={{ 
+                              padding: '8px 6px', 
+                              border: '1px solid #E0E0E0', 
+                              textAlign: 'center',
+                              fontFamily: 'monospace',
+                              fontSize: 13
+                            }}>
+                              {row.duration}
+                            </td>
+                            <td style={{ 
+                              padding: '8px 6px', 
+                              border: '1px solid #E0E0E0', 
+                              textAlign: 'center',
+                              fontWeight: 600,
+                              color: row.rate > 100 ? '#4CAF50' : row.rate > 50 ? '#FF9800' : '#F44336'
+                            }}>
+                              {row.rate.toFixed(1)}
+                            </td>
+                            <td style={{ 
+                              padding: '8px 6px', 
+                              border: '1px solid #E0E0E0', 
+                              textAlign: 'center',
+                              fontFamily: 'monospace',
+                              fontSize: 12
+                            }}>
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                                <span style={{ 
+                                  color: row.avgResponse > 1000 ? '#F44336' : row.avgResponse > 500 ? '#FF9800' : '#4CAF50',
+                                  fontWeight: 600
+                                }}>
+                                  Avg: {row.avgResponse}ms
+                                </span>
+                                <span style={{ color: '#666', fontSize: 11 }}>
+                                  Min: {row.minResponse}ms | Max: {row.maxResponse}ms
+                                </span>
+                                <span style={{ color: '#999', fontSize: 10 }}>
+                                  Range: {row.responseTimeRange}ms
+                                </span>
+                              </div>
+                            </td>
+                            <td style={{ 
+                              padding: '8px 6px', 
+                              border: '1px solid #E0E0E0', 
+                              textAlign: 'center'
+                            }}>
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                                <span style={{ 
+                                  color: row.successRate > 95 ? '#4CAF50' : row.successRate > 80 ? '#FF9800' : '#F44336',
+                                  fontWeight: 600
+                                }}>
+                                  {row.successRate.toFixed(1)}%
+                                </span>
+                                <span style={{ color: '#666', fontSize: 11 }}>
+                                  Errors: {row.errors} ({row.errorRate.toFixed(1)}%)
+                                </span>
+                              </div>
+                            </td>
+                            <td style={{ 
+                              padding: '8px 6px', 
+                              border: '1px solid #E0E0E0', 
+                              textAlign: 'center'
+                            }}>
+                              <span style={{
+                                background: row.statusColor,
+                                color: 'white',
+                                padding: '4px 8px',
+                                borderRadius: '12px',
+                                fontSize: 11,
+                                fontWeight: 600,
+                                display: 'inline-block',
+                                minWidth: '60px'
+                              }}>
+                                {row.performanceStatus}
+                              </span>
+                            </td>
+                            <td style={{ 
+                              padding: '8px 6px', 
+                              border: '1px solid #E0E0E0', 
+                              textAlign: 'center',
+                              fontFamily: 'monospace',
+                              fontSize: 12
+                            }}>
+                              {row.active !== null ? (
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                                  <span style={{ color: '#4CAF50', fontWeight: 600 }}>
+                                    Active: {row.active}
+                                  </span>
+                                  <span style={{ color: '#666', fontSize: 11 }}>
+                                    Started: {row.started} | Finished: {row.finished}
+                                  </span>
+                                </div>
+                              ) : (
+                                <span style={{ color: '#999' }}>-</span>
+                              )}
+                            </td>
                           </tr>
                         ))}
                       </tbody>
                     </table>
+                    
+                    {/* Summary Statistics */}
+                    <div style={{
+                      marginTop: '16px',
+                      padding: '12px',
+                      background: 'linear-gradient(135deg, #FFF3E0, #FFE0B2)',
+                      borderRadius: '8px',
+                      border: '1px solid #FFCC80'
+                    }}>
+                      <div style={{ 
+                        display: 'grid', 
+                        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
+                        gap: '12px',
+                        fontSize: 13
+                      }}>
+                        {(() => {
+                          const totalRow = parseSummaryOutput(summaryOutput).find(row => row.type === 'Total');
+                          const incrementRows = parseSummaryOutput(summaryOutput).filter(row => row.type === 'Increment');
+                          
+                          if (totalRow) {
+                            // Calculate additional metrics
+                            const avgThroughput = incrementRows.length > 0 
+                              ? incrementRows.reduce((sum, row) => sum + row.rate, 0) / incrementRows.length 
+                              : totalRow.rate;
+                            
+                            const responseTimeStability = totalRow.responseTimeRange / totalRow.avgResponse * 100;
+                            
+                            return (
+                              <>
+                                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                  <span style={{ fontWeight: 600, color: '#FF6D00' }}>Total Requests:</span>
+                                  <span style={{ fontWeight: 600 }}>{totalRow.requests.toLocaleString()}</span>
+                                </div>
+                                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                  <span style={{ fontWeight: 600, color: '#FF6D00' }}>Overall Success Rate:</span>
+                                  <span style={{ 
+                                    fontWeight: 600, 
+                                    color: totalRow.successRate > 95 ? '#4CAF50' : totalRow.successRate > 80 ? '#FF9800' : '#F44336'
+                                  }}>
+                                    {totalRow.successRate.toFixed(1)}%
+                                  </span>
+                                </div>
+                                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                  <span style={{ fontWeight: 600, color: '#FF6D00' }}>Average Response Time:</span>
+                                  <span style={{ 
+                                    fontWeight: 600,
+                                    color: totalRow.avgResponse > 1000 ? '#F44336' : totalRow.avgResponse > 500 ? '#FF9800' : '#4CAF50'
+                                  }}>
+                                    {totalRow.avgResponse}ms
+                                  </span>
+                                </div>
+                                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                  <span style={{ fontWeight: 600, color: '#FF6D00' }}>Peak Throughput:</span>
+                                  <span style={{ fontWeight: 600 }}>{totalRow.rate.toFixed(1)} req/s</span>
+                                </div>
+                                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                  <span style={{ fontWeight: 600, color: '#FF6D00' }}>Avg Throughput:</span>
+                                  <span style={{ fontWeight: 600 }}>{avgThroughput.toFixed(1)} req/s</span>
+                                </div>
+                                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                  <span style={{ fontWeight: 600, color: '#FF6D00' }}>Response Time Range:</span>
+                                  <span style={{ 
+                                    fontWeight: 600,
+                                    color: responseTimeStability > 200 ? '#F44336' : responseTimeStability > 100 ? '#FF9800' : '#4CAF50'
+                                  }}>
+                                    {totalRow.responseTimeRange}ms
+                                  </span>
+                                </div>
+                                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                  <span style={{ fontWeight: 600, color: '#FF6D00' }}>Total Errors:</span>
+                                  <span style={{ 
+                                    fontWeight: 600,
+                                    color: totalRow.errors > 0 ? '#F44336' : '#4CAF50'
+                                  }}>
+                                    {totalRow.errors.toLocaleString()}
+                                  </span>
+                                </div>
+                                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                  <span style={{ fontWeight: 600, color: '#FF6D00' }}>Test Phases:</span>
+                                  <span style={{ fontWeight: 600 }}>{incrementRows.length + 1}</span>
+                                </div>
+                              </>
+                            );
+                          }
+                          return null;
+                        })()}
+                      </div>
+                      
+                      {/* Performance Insights */}
+                      {(() => {
+                        const totalRow = parseSummaryOutput(summaryOutput).find(row => row.type === 'Total');
+                        if (totalRow) {
+                          const insights = [];
+                          
+                          if (totalRow.successRate < 95) {
+                            insights.push('⚠️ High error rate detected - consider investigating server issues');
+                          }
+                          if (totalRow.avgResponse > 1000) {
+                            insights.push('🐌 Slow response times - performance optimization recommended');
+                          }
+                          if (totalRow.responseTimeRange > totalRow.avgResponse * 2) {
+                            insights.push('📊 High response time variance - inconsistent performance');
+                          }
+                          if (totalRow.rate < 10) {
+                            insights.push('📉 Low throughput - consider increasing load or optimizing');
+                          }
+                          if (insights.length === 0) {
+                            insights.push('✅ Good performance across all metrics');
+                          }
+                          
+                          return (
+                            <div style={{
+                              marginTop: '12px',
+                              padding: '8px 12px',
+                              background: 'rgba(255, 255, 255, 0.7)',
+                              borderRadius: '6px',
+                              borderLeft: '4px solid #FF6D00'
+                            }}>
+                              <div style={{ fontWeight: 600, color: '#FF6D00', marginBottom: '4px' }}>
+                                Performance Insights:
+                              </div>
+                              {insights.map((insight, idx) => (
+                                <div key={idx} style={{ fontSize: 12, color: '#666', marginBottom: '2px' }}>
+                                  {insight}
+                                </div>
+                              ))}
+                            </div>
+                          );
+                        }
+                        return null;
+                      })()}
+                    </div>
                   </div>
                 ) : (
                   <pre style={{ margin: 0 }}>{summaryOutput}</pre>
                 )}
               </div>
             )}
-
           </div>
 
           {/* History Panel */}
@@ -840,4 +1108,4 @@ const RunTestPage = () => {
   );
 };
 
-export default RunTestPage;
+export default RunTestPage; 
