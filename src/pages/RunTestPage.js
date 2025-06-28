@@ -8,6 +8,9 @@ import {
   FaCheckCircle,
   FaTimesCircle,
   FaHistory,
+  FaChartPie,
+  FaChartLine,
+  FaChartBar,
 } from "react-icons/fa";
 import {
   Box,
@@ -17,7 +20,37 @@ import {
   Autocomplete,
   TextField,
   Paper,
+  Tabs,
+  Tab,
 } from "@mui/material";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  ArcElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler,
+} from 'chart.js';
+import { Line, Bar, Pie, Doughnut } from 'react-chartjs-2';
+
+// Register Chart.js components
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  ArcElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+);
 
 // Utility to safely format dates
 function formatDateSafe(dateString) {
@@ -96,6 +129,329 @@ function parseSummaryOutput(summaryText) {
   
   return summaryData;
 }
+
+// Component for displaying test results charts
+const TestResultsCharts = ({ summaryData }) => {
+  const [activeTab, setActiveTab] = useState(0);
+
+  if (!summaryData || summaryData.length === 0) return null;
+
+  const totalRow = summaryData.find(row => row.type === 'Total');
+  const incrementRows = summaryData.filter(row => row.type === 'Increment');
+
+  // Success vs Error Rate Pie Chart
+  const successErrorData = {
+    labels: ['Successful Requests', 'Failed Requests'],
+    datasets: [{
+      data: [totalRow.successRate, totalRow.errorRate],
+      backgroundColor: ['#4CAF50', '#F44336'],
+      borderColor: ['#45a049', '#d32f2f'],
+      borderWidth: 2,
+    }]
+  };
+
+  // Response Time Distribution
+  const responseTimeData = {
+    labels: ['Min', 'Average', 'Max'],
+    datasets: [{
+      label: 'Response Time (ms)',
+      data: [totalRow.minResponse, totalRow.avgResponse, totalRow.maxResponse],
+      backgroundColor: ['#2196F3', '#FF9800', '#F44336'],
+      borderColor: ['#1976D2', '#F57C00', '#D32F2F'],
+      borderWidth: 2,
+    }]
+  };
+
+  // Throughput Over Time (if increment data available)
+  const throughputData = {
+    labels: incrementRows.map((_, index) => `Phase ${index + 1}`),
+    datasets: [{
+      label: 'Throughput (req/s)',
+      data: incrementRows.map(row => row.rate),
+      borderColor: '#FF6D00',
+      backgroundColor: 'rgba(255, 109, 0, 0.1)',
+      borderWidth: 3,
+      fill: true,
+      tension: 0.4,
+    }]
+  };
+
+  // Performance Metrics Radar Chart
+  const performanceMetrics = {
+    labels: ['Success Rate', 'Response Time', 'Throughput', 'Error Rate', 'Stability'],
+    datasets: [{
+      label: 'Performance Score',
+      data: [
+        totalRow.successRate,
+        Math.max(0, 100 - (totalRow.avgResponse / 10)), // Inverse of response time
+        Math.min(100, totalRow.rate * 2), // Throughput score
+        Math.max(0, 100 - totalRow.errorRate), // Inverse of error rate
+        Math.max(0, 100 - (totalRow.responseTimeRange / totalRow.avgResponse * 50)) // Stability score
+      ],
+      backgroundColor: 'rgba(255, 109, 0, 0.2)',
+      borderColor: '#FF6D00',
+      borderWidth: 2,
+      pointBackgroundColor: '#FF6D00',
+      pointBorderColor: '#fff',
+      pointHoverBackgroundColor: '#fff',
+      pointHoverBorderColor: '#FF6D00'
+    }]
+  };
+
+  // Error Distribution (if multiple phases)
+  const errorDistributionData = {
+    labels: incrementRows.map((_, index) => `Phase ${index + 1}`),
+    datasets: [{
+      label: 'Errors',
+      data: incrementRows.map(row => row.errors),
+      backgroundColor: '#F44336',
+      borderColor: '#D32F2F',
+      borderWidth: 1,
+    }]
+  };
+
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'top',
+        labels: {
+          font: {
+            family: 'Poppins, sans-serif',
+            size: 12
+          }
+        }
+      },
+      tooltip: {
+        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+        titleFont: {
+          family: 'Poppins, sans-serif',
+          size: 14
+        },
+        bodyFont: {
+          family: 'Poppins, sans-serif',
+          size: 12
+        }
+      }
+    }
+  };
+
+  const lineChartOptions = {
+    ...chartOptions,
+    scales: {
+      y: {
+        beginAtZero: true,
+        grid: {
+          color: 'rgba(0, 0, 0, 0.1)'
+        }
+      },
+      x: {
+        grid: {
+          color: 'rgba(0, 0, 0, 0.1)'
+        }
+      }
+    }
+  };
+
+  return (
+    <div style={{ marginTop: '20px' }}>
+      <Typography variant="h6" style={{ marginBottom: '16px', color: '#FF6D00', display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <FaChartPie /> Performance Analytics Dashboard
+      </Typography>
+      
+      <Tabs 
+        value={activeTab} 
+        onChange={(e, newValue) => setActiveTab(newValue)}
+        sx={{
+          '& .MuiTab-root': {
+            color: '#666',
+            fontWeight: 600,
+            textTransform: 'none',
+            minWidth: 'auto',
+            padding: '8px 16px',
+          },
+          '& .Mui-selected': {
+            color: '#FF6D00',
+          },
+          '& .MuiTabs-indicator': {
+            backgroundColor: '#FF6D00',
+          }
+        }}
+      >
+        <Tab label="Overview" />
+        <Tab label="Response Times" />
+        <Tab label="Throughput Analysis" />
+        <Tab label="Error Analysis" />
+        <Tab label="Performance Metrics" />
+      </Tabs>
+
+      <div style={{ marginTop: '20px' }}>
+        {activeTab === 0 && (
+          <Grid container spacing={3}>
+            <Grid item xs={12} md={6}>
+              <Paper elevation={2} style={{ padding: '20px', borderRadius: '12px' }}>
+                <Typography variant="h6" style={{ marginBottom: '16px', color: '#FF6D00' }}>
+                  Success vs Error Rate
+                </Typography>
+                <div style={{ height: '300px', position: 'relative' }}>
+                  <Doughnut 
+                    data={successErrorData} 
+                    options={{
+                      ...chartOptions,
+                      plugins: {
+                        ...chartOptions.plugins,
+                        legend: {
+                          position: 'bottom'
+                        }
+                      }
+                    }}
+                  />
+                </div>
+              </Paper>
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <Paper elevation={2} style={{ padding: '20px', borderRadius: '12px' }}>
+                <Typography variant="h6" style={{ marginBottom: '16px', color: '#FF6D00' }}>
+                  Response Time Distribution
+                </Typography>
+                <div style={{ height: '300px', position: 'relative' }}>
+                  <Bar data={responseTimeData} options={lineChartOptions} />
+                </div>
+              </Paper>
+            </Grid>
+          </Grid>
+        )}
+
+        {activeTab === 1 && (
+          <Paper elevation={2} style={{ padding: '20px', borderRadius: '12px' }}>
+            <Typography variant="h6" style={{ marginBottom: '16px', color: '#FF6D00' }}>
+              Response Time Analysis
+            </Typography>
+            <div style={{ height: '400px', position: 'relative' }}>
+              <Line 
+                data={{
+                  labels: incrementRows.map((_, index) => `Phase ${index + 1}`),
+                  datasets: [
+                    {
+                      label: 'Average Response Time (ms)',
+                      data: incrementRows.map(row => row.avgResponse),
+                      borderColor: '#FF9800',
+                      backgroundColor: 'rgba(255, 152, 0, 0.1)',
+                      borderWidth: 3,
+                      fill: false,
+                      tension: 0.4,
+                    },
+                    {
+                      label: 'Min Response Time (ms)',
+                      data: incrementRows.map(row => row.minResponse),
+                      borderColor: '#4CAF50',
+                      backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                      borderWidth: 2,
+                      fill: false,
+                      tension: 0.4,
+                    },
+                    {
+                      label: 'Max Response Time (ms)',
+                      data: incrementRows.map(row => row.maxResponse),
+                      borderColor: '#F44336',
+                      backgroundColor: 'rgba(244, 67, 54, 0.1)',
+                      borderWidth: 2,
+                      fill: false,
+                      tension: 0.4,
+                    }
+                  ]
+                }} 
+                options={lineChartOptions} 
+              />
+            </div>
+          </Paper>
+        )}
+
+        {activeTab === 2 && (
+          <Paper elevation={2} style={{ padding: '20px', borderRadius: '12px' }}>
+            <Typography variant="h6" style={{ marginBottom: '16px', color: '#FF6D00' }}>
+              Throughput Analysis Over Time
+            </Typography>
+            <div style={{ height: '400px', position: 'relative' }}>
+              <Line data={throughputData} options={lineChartOptions} />
+            </div>
+          </Paper>
+        )}
+
+        {activeTab === 3 && (
+          <Grid container spacing={3}>
+            <Grid item xs={12} md={6}>
+              <Paper elevation={2} style={{ padding: '20px', borderRadius: '12px' }}>
+                <Typography variant="h6" style={{ marginBottom: '16px', color: '#FF6D00' }}>
+                  Error Distribution by Phase
+                </Typography>
+                <div style={{ height: '300px', position: 'relative' }}>
+                  <Bar data={errorDistributionData} options={lineChartOptions} />
+                </div>
+              </Paper>
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <Paper elevation={2} style={{ padding: '20px', borderRadius: '12px' }}>
+                <Typography variant="h6" style={{ marginBottom: '16px', color: '#FF6D00' }}>
+                  Error Rate Trend
+                </Typography>
+                <div style={{ height: '300px', position: 'relative' }}>
+                  <Line 
+                    data={{
+                      labels: incrementRows.map((_, index) => `Phase ${index + 1}`),
+                      datasets: [{
+                        label: 'Error Rate (%)',
+                        data: incrementRows.map(row => row.errorRate),
+                        borderColor: '#F44336',
+                        backgroundColor: 'rgba(244, 67, 54, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                      }]
+                    }} 
+                    options={lineChartOptions} 
+                  />
+                </div>
+              </Paper>
+            </Grid>
+          </Grid>
+        )}
+
+        {activeTab === 4 && (
+          <Paper elevation={2} style={{ padding: '20px', borderRadius: '12px' }}>
+            <Typography variant="h6" style={{ marginBottom: '16px', color: '#FF6D00' }}>
+              Overall Performance Metrics
+            </Typography>
+            <div style={{ height: '400px', position: 'relative' }}>
+              <Line 
+                data={performanceMetrics} 
+                options={{
+                  ...chartOptions,
+                  scales: {
+                    r: {
+                      beginAtZero: true,
+                      max: 100,
+                      grid: {
+                        color: 'rgba(0, 0, 0, 0.1)'
+                      },
+                      pointLabels: {
+                        font: {
+                          family: 'Poppins, sans-serif',
+                          size: 12
+                        }
+                      }
+                    }
+                  }
+                }} 
+              />
+            </div>
+          </Paper>
+        )}
+      </div>
+    </div>
+  );
+};
 
 const RunTestPage = () => {
   const [availableFiles, setAvailableFiles] = useState([]);
@@ -975,6 +1331,11 @@ const RunTestPage = () => {
                   </div>
                 ) : (
                   <pre style={{ margin: 0 }}>{summaryOutput}</pre>
+                )}
+                
+                {/* Professional Charts and Analytics */}
+                {(parseSummaryOutput(summaryOutput).length > 0) && (
+                  <TestResultsCharts summaryData={parseSummaryOutput(summaryOutput)} />
                 )}
               </div>
             )}
