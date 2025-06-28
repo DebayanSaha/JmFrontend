@@ -33,6 +33,40 @@ function formatDateSafe(dateString) {
   return `${day}/${month}/${year}, ${hours}:${minutes}:${seconds}`;
 }
 
+// Utility to parse summary output and format as table data
+function parseSummaryOutput(summaryText) {
+  if (!summaryText) return [];
+  
+  const lines = summaryText.split('\n');
+  const summaryData = [];
+  
+  lines.forEach(line => {
+    if (line.trim().startsWith('summary')) {
+      // Parse summary line: summary + 1 in 00:00:02 = 0.5/s Avg: 62 Min: 62 Max: 62 Err: 1 (100.00%) Active: 20 Started: 20 Finished: 0
+      const match = line.match(/summary\s*([+=])\s*(\d+)\s+in\s+(\d{2}:\d{2}:\d{2})\s*=\s*([\d.]+)\/s\s+Avg:\s*(\d+)\s+Min:\s*(\d+)\s+Max:\s*(\d+)\s+Err:\s*(\d+)\s*\(([\d.]+)%\)\s*(?:Active:\s*(\d+)\s+Started:\s*(\d+)\s+Finished:\s*(\d+))?/);
+      
+      if (match) {
+        summaryData.push({
+          type: match[1] === '+' ? 'Increment' : match[1] === '=' ? 'Total' : 'Summary',
+          requests: parseInt(match[2]),
+          duration: match[3],
+          rate: parseFloat(match[4]),
+          avgResponse: parseInt(match[5]),
+          minResponse: parseInt(match[6]),
+          maxResponse: parseInt(match[7]),
+          errors: parseInt(match[8]),
+          errorRate: parseFloat(match[9]),
+          active: match[10] ? parseInt(match[10]) : null,
+          started: match[11] ? parseInt(match[11]) : null,
+          finished: match[12] ? parseInt(match[12]) : null
+        });
+      }
+    }
+  });
+  
+  return summaryData;
+}
+
 const RunTestPage = () => {
   const [availableFiles, setAvailableFiles] = useState([]);
   const [selectedFilename, setSelectedFilename] = useState("");
@@ -624,14 +658,55 @@ const RunTestPage = () => {
                 borderRadius: '12px',
                 border: '1px solid #E0E0E0',
                 fontFamily: 'monospace',
-                whiteSpace: 'pre-wrap',
                 maxHeight: '300px',
-                overflowY: 'auto'
+                overflowY: 'auto',
+                whiteSpace: 'normal',
               }}>
                 <Typography variant="h6" style={{ marginBottom: '12px', color: '#FF6D00' }}>
                   Test Summary
                 </Typography>
-                {summaryOutput}
+                {(parseSummaryOutput(summaryOutput).length > 0) ? (
+                  <div style={{overflowX: 'auto'}}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', fontFamily: 'inherit', fontSize: 15 }}>
+                      <thead>
+                        <tr style={{ background: '#FFE0B2', color: '#333' }}>
+                          <th style={{ padding: '6px 10px', border: '1px solid #E0E0E0' }}>Type</th>
+                          <th style={{ padding: '6px 10px', border: '1px solid #E0E0E0' }}>Requests</th>
+                          <th style={{ padding: '6px 10px', border: '1px solid #E0E0E0' }}>Duration</th>
+                          <th style={{ padding: '6px 10px', border: '1px solid #E0E0E0' }}>Rate (req/s)</th>
+                          <th style={{ padding: '6px 10px', border: '1px solid #E0E0E0' }}>Avg (ms)</th>
+                          <th style={{ padding: '6px 10px', border: '1px solid #E0E0E0' }}>Min (ms)</th>
+                          <th style={{ padding: '6px 10px', border: '1px solid #E0E0E0' }}>Max (ms)</th>
+                          <th style={{ padding: '6px 10px', border: '1px solid #E0E0E0' }}>Errors</th>
+                          <th style={{ padding: '6px 10px', border: '1px solid #E0E0E0' }}>Error %</th>
+                          <th style={{ padding: '6px 10px', border: '1px solid #E0E0E0' }}>Active</th>
+                          <th style={{ padding: '6px 10px', border: '1px solid #E0E0E0' }}>Started</th>
+                          <th style={{ padding: '6px 10px', border: '1px solid #E0E0E0' }}>Finished</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {parseSummaryOutput(summaryOutput).map((row, idx) => (
+                          <tr key={idx} style={{ background: idx % 2 === 0 ? '#FFF8F1' : '#FFFFFF' }}>
+                            <td style={{ padding: '6px 10px', border: '1px solid #E0E0E0', fontWeight: 600 }}>{row.type}</td>
+                            <td style={{ padding: '6px 10px', border: '1px solid #E0E0E0' }}>{row.requests}</td>
+                            <td style={{ padding: '6px 10px', border: '1px solid #E0E0E0' }}>{row.duration}</td>
+                            <td style={{ padding: '6px 10px', border: '1px solid #E0E0E0' }}>{row.rate}</td>
+                            <td style={{ padding: '6px 10px', border: '1px solid #E0E0E0' }}>{row.avgResponse}</td>
+                            <td style={{ padding: '6px 10px', border: '1px solid #E0E0E0' }}>{row.minResponse}</td>
+                            <td style={{ padding: '6px 10px', border: '1px solid #E0E0E0' }}>{row.maxResponse}</td>
+                            <td style={{ padding: '6px 10px', border: '1px solid #E0E0E0' }}>{row.errors}</td>
+                            <td style={{ padding: '6px 10px', border: '1px solid #E0E0E0' }}>{row.errorRate}%</td>
+                            <td style={{ padding: '6px 10px', border: '1px solid #E0E0E0' }}>{row.active !== null ? row.active : '-'}</td>
+                            <td style={{ padding: '6px 10px', border: '1px solid #E0E0E0' }}>{row.started !== null ? row.started : '-'}</td>
+                            <td style={{ padding: '6px 10px', border: '1px solid #E0E0E0' }}>{row.finished !== null ? row.finished : '-'}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <pre style={{ margin: 0 }}>{summaryOutput}</pre>
+                )}
               </div>
             )}
 
