@@ -1072,7 +1072,7 @@ const RunTestPage = () => {
                 borderRadius: '12px',
                 border: '1px solid #E0E0E0',
                 fontFamily: 'monospace',
-                maxHeight: '300px',
+                maxHeight: '480px',
                 overflowY: 'auto',
                 whiteSpace: 'normal',
               }}>
