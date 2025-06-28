@@ -645,6 +645,7 @@ const TestPlanGeneration = () => {
         .tp-panels {
           display: flex;
           gap: 24px;
+          
           justify-content: center;
           align-items: flex-start;
           margin-top: 0;

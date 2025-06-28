@@ -11,10 +11,11 @@ function Layout({ licenseStatus, onLogout }) {
   const isMobile = isXs || isSm;
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const navigate = useNavigate();
 
   // Sidebar width for desktop
-  const sidebarWidth = 260;
+  const sidebarWidth = isCollapsed ? 80 : 260;
 
   return (
     <div style={{
@@ -64,7 +65,7 @@ function Layout({ licenseStatus, onLogout }) {
             width: isMobile ? 0 : sidebarWidth,
             minWidth: isMobile ? 0 : sidebarWidth,
             maxWidth: isMobile ? 0 : sidebarWidth,
-            transition: 'width 0.3s',
+            transition: 'width 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
             zIndex: isMobile ? 10000 : 1200,
             position: isMobile ? 'fixed' : 'relative',
             left: 0,
@@ -77,6 +78,8 @@ function Layout({ licenseStatus, onLogout }) {
             isMobile={isMobile}
             sidebarOpen={sidebarOpen}
             setSidebarOpen={setSidebarOpen}
+            isCollapsed={isCollapsed}
+            setIsCollapsed={setIsCollapsed}
           />
         </div>
         {/* Mobile overlay */}
@@ -109,7 +112,7 @@ function Layout({ licenseStatus, onLogout }) {
             overflowX: 'hidden',
             paddingTop: '40px',
             background: 'linear-gradient(to bottom, #FFF8F1, #FFF1E6)',
-            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+            transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
           }}
         >
           <main 
