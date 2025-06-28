@@ -860,9 +860,8 @@ const RunTestPage = () => {
             flexDirection: 'column',
             animation: 'fadeIn 0.7s ease',
             transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-            flex: '3 1 0',
+            flex: '2 1 0',
             minWidth: '0',
-            maxWidth: '800px',
             boxShadow: '0 8px 24px rgba(0,0,0,0.1)',
             cursor: 'default'
           }}
@@ -1346,14 +1345,14 @@ const RunTestPage = () => {
           <div className="tp-panel tp-panel-history card-transition" style={{
             background: 'var(--tp-white)',
             borderRadius: 'var(--tp-radius)',
-            padding: '20px',
+            padding: '24px',
             display: 'flex',
             flexDirection: 'column',
             animation: 'fadeIn 0.7s ease',
             transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-            minWidth: '240px',
-            maxWidth: '280px',
-            flex: '1 1 260px',
+            minWidth: '280px',
+            maxWidth: '340px',
+            flex: '1 1 320px',
             boxShadow: '0 8px 24px rgba(0,0,0,0.1)',
             cursor: 'default'
           }}
@@ -1366,17 +1365,17 @@ const RunTestPage = () => {
               e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.1)';
             }}>
             <div className="tp-panel-title" style={{
-              fontSize: '18px',
+              fontSize: '20px',
               fontWeight: '700',
               color: 'var(--tp-orange-dark)',
-              marginBottom: '16px',
+              marginBottom: '20px',
               letterSpacing: '0.2px'
             }}>
               <FaHistory style={{ marginRight: '8px' }} />
               History
             </div>
 
-            <div className="tp-history-search" style={{ marginBottom: '12px' }}>
+            <div className="tp-history-search" style={{ marginBottom: '16px' }}>
               <TextField
                 placeholder="Search files..."
                 size="small"
@@ -1403,24 +1402,24 @@ const RunTestPage = () => {
             <div className="tp-history-list" style={{
               display: 'flex',
               flexDirection: 'column',
-              gap: '12px',
+              gap: '16px',
               overflowY: 'auto',
               overflowX: 'hidden',
-              maxHeight: '350px',
+              maxHeight: '400px',
             }}>
               {filteredHistory.length > 0 ? (
                 filteredHistory.map((item, idx) => (
                   <div key={idx} className="tp-history-card" style={{
                     background: 'var(--tp-gray)',
-                    borderRadius: '10px',
-                    padding: '12px 14px',
+                    borderRadius: '12px',
+                    padding: '16px 18px',
                     border: '1px solid var(--tp-border)',
                     transition: 'box-shadow 0.2s, transform 0.2s',
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    gap: '6px',
+                    gap: '8px',
                     position: 'relative',
                     wordBreak: 'break-all',
                     overflowWrap: 'anywhere',
@@ -1435,17 +1434,17 @@ const RunTestPage = () => {
                   }}
                   >
                     <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
-                      <div className="tp-history-filename" style={{ fontWeight: '600', fontSize: '13px', marginBottom: '3px', color: 'var(--tp-text)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <div className="tp-history-filename" style={{ fontWeight: '600', fontSize: '15px', marginBottom: '4px', color: 'var(--tp-text)', display: 'flex', alignItems: 'center', gap: '6px' }}>
                         {item.filename}
                       </div>
-                      <div className="tp-history-meta" style={{ fontSize: '11px', color: '#888' }}>Ran: {item.date}</div>
+                      <div className="tp-history-meta" style={{ fontSize: '13px', color: '#888' }}>Ran: {item.date}</div>
                     </div>
                     <FaDownload
                       style={{
-                        fontSize: '16px',
+                        fontSize: '18px',
                         color: '#FF6D00',
                         cursor: 'pointer',
-                        marginLeft: '6px',
+                        marginLeft: '8px',
                         transition: 'color 0.2s',
                       }}
                       title="Download file"
