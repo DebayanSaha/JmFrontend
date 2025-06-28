@@ -42,90 +42,102 @@ const TestPlanGeneration = () => {
     setIsLoading(true);
     setDownloadReady(false);
 
-    // Send files if any
-    if (attachedFiles.length > 0) {
-      for (const file of attachedFiles) {
-        try {
-          const formData = new FormData();
-          formData.append("file", file);
-          const res = await axiosInstance.post("/upload-jmx", formData, {
-            headers: { "Content-Type": "multipart/form-data" },
-          });
-          if (res.data.status === "success") {
-            setChat((prev) => [
-              ...prev,
-              { type: "user", text: `JMX file sent: ${file.name}` },
-              { type: "bot", text: `JMX file ${file.name} uploaded successfully!` }
-            ]);
-            fetchHistory();
-          } else {
-            setChat((prev) => [
-              ...prev,
-              { type: "user", text: `JMX file sent: ${file.name}` },
-              { type: "bot", text: res.data.message || "Failed to upload JMX file." }
-            ]);
-          }
-        } catch (error) {
-          setChat((prev) => [
-            ...prev,
-            { type: "user", text: `JMX file sent: ${file.name}` },
-            { type: "bot", text: `Error uploading JMX file: ${error.response?.data?.message || error.message}` }
-          ]);
-        }
-      }
-      setAttachedFiles([]);
-      setMessage("");
-      setIsLoading(false);
-      return;
-    }
-
-    // If only message, send as before
-    const currentMessage = message;
-    setChat((prev) => [...prev, { type: "user", text: currentMessage }]);
-    setMessage("");
     try {
-      const response = await axiosInstance.post("/generate-test-plan", {
-        prompt: currentMessage,
+      const formData = new FormData();
+      
+      // Add prompt if provided
+      if (message.trim()) {
+        formData.append("prompt", message.trim());
+      }
+      
+      // Add file if provided (only support single file for now)
+      if (attachedFiles.length > 0) {
+        formData.append("file", attachedFiles[0]);
+      }
+
+      // Use the unified endpoint for all cases
+      const response = await axiosInstance.post("/generate-test-plan", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
       });
+
       if (response.data.status === "success") {
         const filename = response.data.jmx_filename;
+        
+        // Add user message to chat
+        let userMessage = "";
+        if (message.trim() && attachedFiles.length > 0) {
+          userMessage = `Prompt: "${message.trim()}" with file: ${attachedFiles[0].name}`;
+        } else if (message.trim()) {
+          userMessage = message.trim();
+        } else if (attachedFiles.length > 0) {
+          userMessage = `Uploaded file: ${attachedFiles[0].name}`;
+        }
+        
         setChat((prev) => [
           ...prev,
+          { type: "user", text: userMessage },
           {
             type: "bot",
-            text: "Test plan generated successfully! Click 'Download' to get the JMX file.",
+            text: response.data.message || "Test plan processed successfully! Click 'Download' to get the JMX file.",
           },
         ]);
+        
         setJmxFilename(filename);
         setDownloadReady(true);
+        
+        // Update history
         const now = formatDateSafe(new Date());
-        const testType = currentMessage.toLowerCase().includes("load test")
-          ? "Load Test"
-          : currentMessage.toLowerCase().includes("api")
-          ? "API"
-          : "Other";
+        const testType = inferTestType(filename);
         setHistory((prev) => [
           { filename, date: now, testType },
           ...prev,
         ]);
+        
+        // Refresh history from server
+        fetchHistory();
       } else {
+        // Add user message to chat
+        let userMessage = "";
+        if (message.trim() && attachedFiles.length > 0) {
+          userMessage = `Prompt: "${message.trim()}" with file: ${attachedFiles[0].name}`;
+        } else if (message.trim()) {
+          userMessage = message.trim();
+        } else if (attachedFiles.length > 0) {
+          userMessage = `Uploaded file: ${attachedFiles[0].name}`;
+        }
+        
         setChat((prev) => [
           ...prev,
+          { type: "user", text: userMessage },
           {
             type: "bot",
-            text: response.data.message || "Failed to generate test plan.",
+            text: response.data.message || "Failed to process test plan.",
           },
         ]);
       }
     } catch (error) {
+      // Add user message to chat
+      let userMessage = "";
+      if (message.trim() && attachedFiles.length > 0) {
+        userMessage = `Prompt: "${message.trim()}" with file: ${attachedFiles[0].name}`;
+      } else if (message.trim()) {
+        userMessage = message.trim();
+      } else if (attachedFiles.length > 0) {
+        userMessage = `Uploaded file: ${attachedFiles[0].name}`;
+      }
+      
       setChat((prev) => [
         ...prev,
+        { type: "user", text: userMessage },
         {
           type: "bot",
-          text: `Error generating test plan: ${error.response?.data?.message || error.message}`,
+          text: `Error processing test plan: ${error.response?.data?.message || error.message}`,
         },
       ]);
     } finally {
+      // Clear form
+      setAttachedFiles([]);
+      setMessage("");
       setIsLoading(false);
     }
   };
@@ -198,8 +210,8 @@ const TestPlanGeneration = () => {
       if (fileInputRef.current) fileInputRef.current.value = "";
       return;
     }
-    if (attachedFiles.length >= 2) {
-      alert('You can attach a maximum of 2 files.');
+    if (attachedFiles.length >= 1) {
+      alert('You can attach only one file at a time.');
       if (fileInputRef.current) fileInputRef.current.value = "";
       return;
     }
@@ -208,13 +220,13 @@ const TestPlanGeneration = () => {
       if (fileInputRef.current) fileInputRef.current.value = "";
       return;
     }
-    setAttachedFiles(prev => [...prev, file]);
+    setAttachedFiles([file]);
     setShowUploadMenu(false);
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   const handleRemoveFile = (name) => {
-    setAttachedFiles(prev => prev.filter(f => f.name !== name));
+    setAttachedFiles([]);
   };
 
   return (
@@ -327,17 +339,17 @@ const TestPlanGeneration = () => {
                     left: 16,
                     top: '50%',
                     transform: 'translateY(-50%)',
-                    cursor: attachedFiles.length >= 2 ? 'not-allowed' : 'pointer',
+                    cursor: attachedFiles.length >= 1 ? 'not-allowed' : 'pointer',
                     zIndex: 2,
-                    opacity: attachedFiles.length >= 2 ? 0.4 : 1,
+                    opacity: attachedFiles.length >= 1 ? 0.4 : 1,
                   }}
-                  onClick={attachedFiles.length >= 2 ? undefined : handleUploadClick}
+                  onClick={attachedFiles.length >= 1 ? undefined : handleUploadClick}
                 />
                 {/* Chat input with left padding for icon */}
                 <textarea
                   className={`tp-chat-input`}
                   style={{ paddingLeft: 44 }}
-                  placeholder={isLoading ? "Generating response..." : "Type your message here..."}
+                  placeholder={isLoading ? "Processing..." : "Type your prompt or upload a JMX file..."}
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   onKeyDown={(e) => {
